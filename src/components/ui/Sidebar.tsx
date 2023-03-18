@@ -1,10 +1,16 @@
 import { component$ } from '@builder.io/qwik'
 import { Link } from '@builder.io/qwik-city'
 
-export const Sidebar = component$(() => {
+type Props = {
+	userData: {
+		name: string
+	}
+}
+
+export const Sidebar = component$((props: Props) => {
 	return (
 		<aside class="md:w-80 lg:w-96 px-5 py-10">
-			<p class="text-xl font-bold">Hola: {'?_name'}</p>
+			<p class="text-xl font-bold">Hola: {props.userData.name}</p>
 
 			<Link
 				href="new-project"
