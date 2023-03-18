@@ -1,7 +1,9 @@
 import { component$ } from '@builder.io/qwik'
-import { Link } from '@builder.io/qwik-city'
+import { Form, Link } from '@builder.io/qwik-city'
+import { useAuthSignout } from '~/routes/plugin@auth'
 
 export const Header = component$(() => {
+	const actionSignout = useAuthSignout()
 	return (
 		<header class="px-4  py-5 bg-white border-b">
 			<nav class="md:flex md:justify-between">
@@ -17,13 +19,15 @@ export const Header = component$(() => {
 						Proyectos
 					</Link>
 
-					<button
-						type="button"
-						class="
+					<Form action={actionSignout}>
+						<button
+							type="submit"
+							class="
           text-white text-sm bg-sky-600 p-3 rounded-md uppercase font-bold
           ">
-						Cerrar sesion
-					</button>
+							Cerrar sesion
+						</button>
+					</Form>
 				</div>
 			</nav>
 		</header>
