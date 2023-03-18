@@ -1,12 +1,7 @@
 import { component$ } from '@builder.io/qwik'
 import { Link } from '@builder.io/qwik-city'
 
-type HeaderProps = {
-	loggedIn: boolean
-}
-
-export const Header = component$((props: HeaderProps) => {
-	console.log('Header', props)
+export const Header = component$(() => {
 	return (
 		<header class="px-4  py-5 bg-white border-b">
 			<nav class="md:flex md:justify-between">
