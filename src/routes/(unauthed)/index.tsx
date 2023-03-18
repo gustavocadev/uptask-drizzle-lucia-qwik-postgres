@@ -1,10 +1,6 @@
 import { component$ } from '@builder.io/qwik'
-import { type DocumentHead, Link, Form, routeLoader$ } from '@builder.io/qwik-city'
+import { type DocumentHead, Link, Form } from '@builder.io/qwik-city'
 import { useAuthSignin } from '~/routes/plugin@auth'
-
-export const useLoaderData = routeLoader$(({ redirect }) => {
-	throw redirect(303, '/api/auth/signin')
-})
 
 export const head: DocumentHead = {
 	title: 'Welcome to Qwik',
@@ -15,20 +11,6 @@ export const head: DocumentHead = {
 		},
 	],
 }
-
-// export const useLoginAction = routeAction$(
-// 	(values) => {
-// 		console.log({ values })
-
-// 		return {
-// 			success: true,
-// 		}
-// 	},
-// 	zod$({
-// 		email: z.string().email(),
-// 		password: z.string(),
-// 	})
-// )
 
 export default component$(() => {
 	// const loginAction = useLoginAction()
