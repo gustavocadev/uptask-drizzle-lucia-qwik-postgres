@@ -1,12 +1,18 @@
 import { component$, Slot } from '@builder.io/qwik'
+import { getSessionData } from '@builder.io/qwik-auth'
 import { routeLoader$ } from '@builder.io/qwik-city'
 
-export const useServerTimeLoader = routeLoader$(({ request }) => {
-	console.log(request)
+export const useLoaderData = routeLoader$(async ({ request, redirect, env }) => {
+	const session = await getSessionData(request, {
+		secret: env.get('QWIK_AUTH_SECRET'),
+		providers: [],
+	})
+	console.log('🚀 ~ file: index.tsx ~ line 20 ~ useLoaderData ~ session')
 
-	return {
-		date: new Date().toISOString(),
+	if (!session) {
+		throw redirect(303, '/login')
 	}
+	throw redirect(303, '/projects')
 })
 
 export default component$(() => {
