@@ -1,8 +1,18 @@
 import { component$ } from '@builder.io/qwik'
-import { routeAction$, Form, Link, zod$, z } from '@builder.io/qwik-city'
+import { routeAction$, Form, Link, zod$, z, routeLoader$ } from '@builder.io/qwik-city'
 import { prisma } from '~/server/prisma'
 import crypto from 'node:crypto'
 import argon2 from 'argon2'
+import { getUserData } from '~/utils/session'
+
+export const useLoaderData = routeLoader$(async ({ env, request, redirect }) => {
+	const session = await getUserData(request, env)
+	if (session) {
+		console.log('There is a session')
+		throw redirect(303, '/projects')
+	}
+	return {}
+})
 
 export const useSignupAction = routeAction$(
 	async (values, request) => {
