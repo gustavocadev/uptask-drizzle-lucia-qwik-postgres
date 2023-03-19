@@ -43,6 +43,7 @@
 		"@auth/core": "^0.5.1",
 		"@builder.io/qwik-auth": "0.0.5",
 		"@prisma/client": "^4.11.0",
-		"argon2": "^0.30.3"
+		"argon2": "^0.30.3",
+		"date-fns": "^2.29.3"
 	}
 }
