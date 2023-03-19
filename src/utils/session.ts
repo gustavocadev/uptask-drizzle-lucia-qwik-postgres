@@ -1,9 +1,13 @@
 import { getSessionData } from '@builder.io/qwik-auth'
 import { prisma } from '~/server/prisma'
 
-export const getUserSession = async (req: Request, secret: string) => {
+type Env = {
+	get: (key: string) => string | undefined
+}
+
+export const getUserData = async (req: Request, env: Env) => {
 	const session = await getSessionData(req, {
-		secret,
+		secret: env.get('QWIK_AUTH_SECRET') ?? '',
 		providers: [],
 	})
 
