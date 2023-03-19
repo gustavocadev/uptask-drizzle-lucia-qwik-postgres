@@ -1,6 +1,17 @@
 import { component$ } from '@builder.io/qwik'
-import { type DocumentHead, Link, Form } from '@builder.io/qwik-city'
+import { type DocumentHead, Link, Form, routeLoader$ } from '@builder.io/qwik-city'
 import { useAuthSignin } from '~/routes/plugin@auth'
+import { getUserData } from '~/utils/session'
+
+export const useLoaderData = routeLoader$(async ({ request, env, redirect }) => {
+	const session = await getUserData(request, env)
+	// if (!session) {
+	// 	console.log('There is no session')
+	// 	throw redirect(303, '/api/auth/signin')
+	// }
+	// console.log('There is a session')
+	if (!session) throw redirect(303, '/api/auth/signin')
+})
 
 export const head: DocumentHead = {
 	title: 'Welcome to Qwik',
