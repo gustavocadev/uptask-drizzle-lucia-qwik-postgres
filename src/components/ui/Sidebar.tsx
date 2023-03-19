@@ -13,7 +13,7 @@ export const Sidebar = component$((props: Props) => {
 			<p class="text-xl font-bold">Hola: {props.userData.name}</p>
 
 			<Link
-				href="new-project"
+				href="/projects/new-project"
 				class="bg-sky-600 w-full text-white uppercase p-3 font-bold block mt-5 text-center rounded-lg">
 				Nuevo proyecto
 			</Link>
