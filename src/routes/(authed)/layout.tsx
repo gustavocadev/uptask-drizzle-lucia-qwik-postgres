@@ -2,10 +2,10 @@ import { component$, Slot } from '@builder.io/qwik'
 import { routeLoader$ } from '@builder.io/qwik-city'
 import { Header } from '~/components/ui/Header'
 import { Sidebar } from '~/components/ui/Sidebar'
-import { getUserSession } from '~/utils/session'
+import { getUserData } from '~/utils/session'
 
 export const useLoaderUserData = routeLoader$(async ({ request, env, redirect }) => {
-	const user = await getUserSession(request, env.get('QWIK_AUTH_SECRET') ?? '')
+	const user = await getUserData(request, env)
 
 	if (!user) {
 		throw redirect(303, '/')
