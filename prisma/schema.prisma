@@ -10,9 +10,9 @@ datasource db {
 model Project {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  // relation one-one
+  // relation many-one
   author   User   @relation(name: "Author", fields: [authorId], references: [id])
-  authorId String @unique @db.ObjectId
+  authorId String @db.ObjectId
 
   // relation many-many in mongodb
   contributors   User[]   @relation(name: "Contributors", fields: [contributorIDs], references: [id])
@@ -32,7 +32,7 @@ model Project {
 model Task {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt    DateTime @default(now()) @db.Date
-  deliveryDate String
+  deliveryDate DateTime @default(now()) @db.Date
   description  String
   name         String
   priority     String
@@ -42,25 +42,34 @@ model Task {
   state        Boolean  @default(false)
   updatedAt    DateTime @default(now()) @db.Date()
 
+  // many-to-one relation
+  userWhoCompletedTask User? @relation(name: "UserWhoCompletedTask", fields: [userWhoCompletedTaskId], references: [id])
+
+  // it needs to be nullable because it can be null
+  userWhoCompletedTaskId String? @db.ObjectId
+
   @@map("tasks")
 }
 
 model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
-  email     String   @unique()
+  email     String   @unique
   isconfirm Boolean  @default(false)
   name      String
   password  String
   token     String
   updatedAt DateTime @default(now())
 
-  // relation one-one
-  ownProject Project? @relation(name: "Author")
+  // relation one-many
+  projects Project[] @relation(name: "Author")
 
   // relation many-many in mongodb
   contributorProjects Project[] @relation(name: "Contributors", fields: [contributorIDs], references: [id])
   contributorIDs      String[]  @db.ObjectId
+
+  // one to many
+  completedTasks Task[] @relation(name: "UserWhoCompletedTask")
 
   @@map("users")
 }
