@@ -7,11 +7,15 @@ import {
   zod$,
 } from '@builder.io/qwik-city';
 import { prisma } from '~/server/prisma';
-import { parse } from 'date-fns';
+import * as dateFns from 'date-fns';
 
 export const useActionNewTask = routeAction$(
   async (values, request) => {
-    const parseDateToUTC = parse(values.dueDate, 'yyyy-MM-dd', new Date());
+    const parseDateToUTC = dateFns.parse(
+      values.dueDate,
+      'yyyy-MM-dd',
+      new Date()
+    );
 
     await prisma.task.create({
       data: {

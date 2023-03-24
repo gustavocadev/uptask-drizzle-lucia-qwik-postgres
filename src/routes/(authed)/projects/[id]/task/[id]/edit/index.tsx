@@ -7,7 +7,7 @@ import {
   zod$,
 } from '@builder.io/qwik-city';
 import { prisma } from '~/server/prisma';
-import dateFns from 'date-fns';
+import * as dateFns from 'date-fns';
 
 export const useActionUpdateTask = routeAction$(
   async (values, request) => {
