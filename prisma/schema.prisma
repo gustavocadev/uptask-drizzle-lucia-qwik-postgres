@@ -11,12 +11,12 @@ model Project {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   // relation many-one
-  author   User   @relation(name: "Author", fields: [authorId], references: [id])
-  authorId String @db.ObjectId
+  author   AuthUser @relation(name: "Author", fields: [authorId], references: [id])
+  authorId String
 
   // relation many-many in mongodb
-  contributors   User[]   @relation(name: "Contributors", fields: [contributorIDs], references: [id])
-  contributorIDs String[] @db.ObjectId
+  contributors   AuthUser[] @relation(name: "Contributors", fields: [contributorIDs], references: [id])
+  contributorIDs String[]
 
   createdAt    DateTime @default(now()) @db.Date
   customer     String
@@ -43,21 +43,24 @@ model Task {
   updatedAt    DateTime @default(now()) @db.Date()
 
   // many-to-one relation
-  userWhoCompletedTask User? @relation(name: "UserWhoCompletedTask", fields: [userWhoCompletedTaskId], references: [id])
+  userWhoCompletedTask AuthUser? @relation(name: "UserWhoCompletedTask", fields: [userWhoCompletedTaskId], references: [id])
 
   // it needs to be nullable because it can be null
-  userWhoCompletedTaskId String? @db.ObjectId
+  userWhoCompletedTaskId String?
 
   @@map("tasks")
 }
 
-model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+model AuthUser {
+  id           String        @id @map("_id")
+  auth_session AuthSession[]
+  auth_key     AuthKey[]
+
+  // custom fields
   createdAt DateTime @default(now())
   email     String   @unique
   isconfirm Boolean  @default(false)
   name      String
-  password  String
   token     String
   updatedAt DateTime @default(now())
 
@@ -71,5 +74,28 @@ model User {
   // one to many
   completedTasks Task[] @relation(name: "UserWhoCompletedTask")
 
-  @@map("users")
+  @@map("auth_user")
+}
+
+model AuthSession {
+  id             String   @id @map("_id")
+  user_id        String
+  active_expires BigInt
+  idle_expires   BigInt
+  auth_user      AuthUser @relation(references: [id], fields: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("auth_session")
+}
+
+model AuthKey {
+  id              String   @id @map("_id")
+  hashed_password String?
+  user_id         String
+  primary_key     Boolean
+  expires         BigInt?
+  auth_user       AuthUser @relation(references: [id], fields: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("auth_key")
 }
