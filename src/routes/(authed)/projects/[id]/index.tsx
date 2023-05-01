@@ -146,7 +146,7 @@ export default component$(() => {
       </div>
       <div class="flex items-center justify-between mt-10">
         <p class="font-bold text-xl">Colaboradores</p>
-        {loaderUserAuth.value.user?.id ===
+        {loaderUserAuth.value.user?.userId ===
           loaderProject.value.project?.authorId && (
           <Link
             class="uppercase font-bold text-gray-400 hover:text-black transition-colors "
@@ -165,7 +165,7 @@ export default component$(() => {
               key={contributor.id}
               projectId={loaderProject.value.project?.id ?? ''}
               authorId={loaderProject.value.project?.authorId ?? ''}
-              userAuthId={loaderUserAuth.value.user?.id ?? ''}
+              userAuthId={loaderUserAuth.value.user?.userId ?? ''}
             />
           ))
         ) : (
