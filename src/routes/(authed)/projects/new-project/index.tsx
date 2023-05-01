@@ -6,12 +6,12 @@ import {
   Form,
   routeLoader$,
 } from '@builder.io/qwik-city';
-import { prisma } from '~/server/prisma';
-import { getUserData } from '~/utils/session';
+import { prisma } from '~/lib/prisma';
 import * as dateFns from 'date-fns';
+import { auth } from '~/lib/lucia';
 
 export const useCreateProjectAction = routeAction$(
-  async (values, request) => {
+  async (values, event) => {
     // this is to parse the input date to a date object in UTC format
     const deliveryDateUTC = dateFns.parse(
       values.dueDate,
@@ -28,7 +28,7 @@ export const useCreateProjectAction = routeAction$(
       },
     });
 
-    return request.redirect(303, '/projects');
+    throw event.redirect(303, '/projects');
   },
   zod$({
     name: z.string().min(1).max(100),
@@ -39,15 +39,16 @@ export const useCreateProjectAction = routeAction$(
   })
 );
 
-export const useLoaderUserData = routeLoader$(async ({ request, env }) => {
-  const user = await getUserData(request, env);
-
-  if (!user) {
-    throw new Error('Not logged in');
-  }
+export const useLoaderUserData = routeLoader$(async (event) => {
+  const authRequest = auth.handleRequest(event);
+  const { user } = await authRequest.validateUser();
+  if (!user)
+    return {
+      userId: null,
+    };
 
   return {
-    userId: user.id,
+    userId: user.userId,
   };
 });
 
