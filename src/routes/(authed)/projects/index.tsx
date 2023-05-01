@@ -1,26 +1,26 @@
 import { component$ } from '@builder.io/qwik';
 import { PreviewProject } from '~/components/project/PreviewProject';
-import { getUserData } from '~/utils/session';
-import { prisma } from '~/server/prisma';
 import { routeLoader$ } from '@builder.io/qwik-city';
+import { prisma } from '~/lib/prisma';
+import { auth } from '~/lib/lucia';
 
-export const useLoaderProjects = routeLoader$(async ({ request, env, url }) => {
-  const user = await getUserData(request, env);
-  if (!user) {
-    return {
-      error: 'Not logged in',
-    };
-  }
+export const useLoaderProjects = routeLoader$(async (event) => {
+  const authRequest = auth.handleRequest(event);
+  const { user } = await authRequest.validateUser();
+  if (!user) return { error: 'Not logged in' };
 
+  console.log({ user });
+
+  // get all the projects that the user is the author or contributor
   const projectsByUser = await prisma.project.findMany({
     where: {
       OR: [
         {
-          authorId: user.id,
+          authorId: user.userId,
         },
         {
           contributorIDs: {
-            has: user.id,
+            has: user.userId,
           },
         },
       ],
@@ -28,7 +28,7 @@ export const useLoaderProjects = routeLoader$(async ({ request, env, url }) => {
   });
 
   // search for params if there is a search param
-  const projectName = url.searchParams.get('search');
+  const projectName = event.url.searchParams.get('search');
 
   // if there is a search param, filter the projects by the search param
   if (projectName) {
@@ -47,8 +47,14 @@ export const useLoaderProjects = routeLoader$(async ({ request, env, url }) => {
   };
 });
 
-export const userLoaderUser = routeLoader$(async ({ request, env }) => {
-  const user = await getUserData(request, env);
+export const userLoaderUser = routeLoader$(async (event) => {
+  const authRequest = auth.handleRequest(event);
+  const { user } = await authRequest.validateUser();
+  if (!user) {
+    return {
+      error: 'Not logged in',
+    };
+  }
 
   return {
     user,
@@ -67,7 +73,7 @@ export default component$(() => {
           <PreviewProject
             project={project}
             key={project.id}
-            authUserId={loaderUser.value.user?.id ?? ''}
+            authUserId={loaderUser.value.user?.userId ?? ''}
           />
         ))}
       </div>
