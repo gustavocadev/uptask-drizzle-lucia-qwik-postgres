@@ -2,8 +2,8 @@ import { component$ } from '@builder.io/qwik';
 import { Link, routeLoader$ } from '@builder.io/qwik-city';
 import Contributor from '~/components/project/Contributor';
 import { Task } from '~/components/task/Task';
-import { prisma } from '~/server/prisma';
-import { getUserData } from '~/utils/session';
+import { auth } from '~/lib/lucia';
+import { prisma } from '~/lib/prisma';
 
 export const useLoaderProject = routeLoader$(async ({ params }) => {
   // the project data
@@ -52,8 +52,13 @@ export const useLoaderContributors = routeLoader$(async ({ params }) => {
   };
 });
 
-export const useLoaderUserAuth = routeLoader$(async ({ request, env }) => {
-  const user = await getUserData(request, env);
+export const useLoaderUserAuth = routeLoader$(async ({ request, cookie }) => {
+  const authRequest = auth.handleRequest({
+    request: request,
+    cookie: cookie,
+  });
+
+  const { user } = await authRequest.validateUser();
 
   return {
     user,
@@ -72,7 +77,7 @@ export default component$(() => {
           {loaderProject.value.project?.name ?? ''}
         </h1>
 
-        {loaderUserAuth.value.user?.id ===
+        {loaderUserAuth.value.user?.userId ===
           loaderProject.value.project?.authorId && (
           <div class="flex items-center gap-2 text-gray-400 hover:text-black">
             <svg
@@ -99,7 +104,7 @@ export default component$(() => {
           </div>
         )}
       </div>
-      {loaderUserAuth.value.user?.id ===
+      {loaderUserAuth.value.user?.userId ===
         loaderProject.value.project?.authorId && (
         <Link
           href={`/projects/${loaderProject.value.project?.id}/task/new`}
@@ -132,7 +137,7 @@ export default component$(() => {
               key={task.id}
               task={task}
               authorId={loaderProject.value.project?.authorId ?? ''}
-              userAuthId={loaderUserAuth.value.user?.id ?? ''}
+              userAuthId={loaderUserAuth.value.user?.userId ?? ''}
             />
           ))
         ) : (
