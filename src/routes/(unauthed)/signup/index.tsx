@@ -1,47 +1,25 @@
 import { component$ } from '@builder.io/qwik';
-import {
-  routeAction$,
-  Form,
-  Link,
-  zod$,
-  z,
-  routeLoader$,
-} from '@builder.io/qwik-city';
-import { prisma } from '~/server/prisma';
-import { nanoid } from 'nanoid';
-import * as bcryptjs from 'bcryptjs';
-import { getUserData } from '~/utils/session';
-
-export const useLoaderData = routeLoader$(
-  async ({ env, request, redirect }) => {
-    const session = await getUserData(request, env);
-    if (session) {
-      console.log('There is a session');
-      throw redirect(303, '/projects');
-    }
-    return {};
-  }
-);
+import { routeAction$, Form, Link, zod$, z } from '@builder.io/qwik-city';
+import { auth } from '~/lib/lucia';
+import crypto from 'node:crypto';
 
 export const useSignupAction = routeAction$(
-  async (values, { redirect }) => {
-    if (values.password !== values.password2) {
-      return { error: 'Passwords must match' };
-    }
-
-    const salt = await bcryptjs.genSalt();
-    const hashedPassword = await bcryptjs.hash(values.password, salt);
-
-    await prisma.user.create({
-      data: {
+  async (values, event) => {
+    // create the user in the database
+    await auth.createUser({
+      primaryKey: {
+        providerId: 'email',
+        providerUserId: values.email,
+        password: values.password,
+      },
+      attributes: {
         name: values.name,
         email: values.email,
-        password: hashedPassword,
-        token: nanoid(),
+        token: crypto.randomUUID(),
       },
     });
-
-    throw redirect(303, '/');
+    // redirect to login page
+    throw event.redirect(303, '/');
   },
   zod$({
     name: z.string().min(3).max(25),
