@@ -1,7 +1,6 @@
 import { component$ } from '@builder.io/qwik';
 import { routeAction$, Form, Link, zod$, z } from '@builder.io/qwik-city';
 import { auth } from '~/lib/lucia';
-import crypto from 'node:crypto';
 
 export const useSignupAction = routeAction$(
   async (values, event) => {
