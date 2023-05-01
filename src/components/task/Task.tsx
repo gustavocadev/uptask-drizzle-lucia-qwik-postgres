@@ -1,7 +1,7 @@
 import { component$, useSignal, useTask$ } from '@builder.io/qwik';
 import { Form, Link, globalAction$, zod$, z } from '@builder.io/qwik-city';
 import type { Task as ITask } from '@prisma/client';
-import { prisma } from '~/server/prisma';
+import { prisma } from '~/lib/prisma';
 import * as dateFns from 'date-fns';
 
 export const useActionToggleState = globalAction$(
