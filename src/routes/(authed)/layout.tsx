@@ -18,13 +18,12 @@ export const useUserDataLoader = routeLoader$(async (event) => {
 });
 
 export default component$(() => {
-  const userData = useUserDataLoader();
   return (
     <>
       <section>
         <Header />
         <div class="md:flex md:min-h-screen">
-          <Sidebar userData={userData.value} />
+          <Sidebar />
           <main class="flex-1 p-10">
             <Slot />
           </main>
