@@ -1,40 +1,41 @@
-import { component$ } from '@builder.io/qwik';
+import { component$, useVisibleTask$ } from '@builder.io/qwik';
 import {
   type DocumentHead,
   Link,
   Form,
-  routeLoader$,
+  useLocation,
+  routeAction$,
+  zod$,
+  z,
 } from '@builder.io/qwik-city';
-import { useAuthSignin } from '~/routes/plugin@auth';
-import { getUserData } from '~/utils/session';
+import { auth } from '~/lib/lucia';
 
-export const useLoaderData = routeLoader$(
-  async ({ request, env, redirect }) => {
-    const session = await getUserData(request, env);
-    // if (!session) {
-    // 	console.log('There is no session')
-    // 	throw redirect(303, '/api/auth/signin')
-    // }
-    if (session) throw redirect(303, '/projects');
+export const useAuthSigninAction = routeAction$(
+  async (values, event) => {
+    const authRequest = auth.handleRequest(event);
 
-    // console.log('There is a session')
-    if (!session) throw redirect(303, '/api/auth/signin');
-  }
+    const key = await auth.useKey('email', values.email, values.password);
+    const session = await auth.createSession(key.userId);
+
+    authRequest.setSession(session);
+
+    // redirect to projects page
+    throw event.redirect(303, '/projects');
+  },
+  zod$({
+    email: z.string().email(),
+    password: z.string().min(6),
+  })
 );
-
-export const head: DocumentHead = {
-  title: 'Welcome to Qwik',
-  meta: [
-    {
-      name: 'description',
-      content: 'Qwik site description',
-    },
-  ],
-};
 
 export default component$(() => {
   // const loginAction = useLoginAction()
-  const loginAction = useAuthSignin();
+  const authSignInAction = useAuthSigninAction();
+  const loc = useLocation();
+
+  useVisibleTask$(() => {
+    console.log(`${loc.url.origin}/projects`);
+  });
 
   return (
     <>
@@ -42,7 +43,12 @@ export default component$(() => {
         Inicia sesion y administra tus{' '}
         <span class="text-slate-700">proyectos</span>
       </h1>
-      <Form action={loginAction} class="mt-10 bg-white shadow rounded-lg p-10">
+      <Form
+        action={authSignInAction}
+        class="mt-10 bg-white shadow rounded-lg p-10"
+      >
+        <input type="hidden" name="providerId" value="credentials" />
+
         <div>
           <label
             class="uppercase text-gray-600 block text-xl font-bold"
@@ -73,9 +79,12 @@ export default component$(() => {
             class="w-full mt-3 p-3 border rounded-xl bg-gray-50"
             name="password"
           />
+          <input
+            type="hidden"
+            name="options.callbackUrl"
+            value={`${loc.url.origin}/projects`}
+          />
         </div>
-
-        {/* <input type="hidden" name="provider" value="credentials" /> */}
 
         <button
           type="submit"
@@ -104,3 +113,13 @@ export default component$(() => {
     </>
   );
 });
+
+export const head: DocumentHead = {
+  title: 'Welcome to Qwik',
+  meta: [
+    {
+      name: 'description',
+      content: 'Qwik site description',
+    },
+  ],
+};
