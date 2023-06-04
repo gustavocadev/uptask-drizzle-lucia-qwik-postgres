@@ -13,7 +13,7 @@ export default defineConfig(() => {
     },
     resolve: {
      alias: {
-        ".prisma/client/index-browser": "./node_modules/.prisma/client/index-browser.js"
+        ".prisma/client/index-browser": "./node_modules/.pnpm/@prisma+client@4.15.0_prisma@4.15.0/node_modules/@prisma/client/index-browser"
       },
     },
   };
