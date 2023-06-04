@@ -3,27 +3,27 @@ lockfileVersion: '6.0'
 dependencies:
   '@lucia-auth/adapter-prisma':
     specifier: ^2.0.0
-    version: 2.0.0(@prisma/client@4.13.0)(lucia-auth@1.5.0)
+    version: 2.0.0(@prisma/client@4.14.0)(lucia-auth@1.7.0)
   '@prisma/client':
-    specifier: ^4.13.0
-    version: 4.13.0(prisma@4.13.0)
+    specifier: ^4.14.0
+    version: 4.14.0(prisma@4.14.0)
   date-fns:
     specifier: ^2.29.3
     version: 2.29.3
   lucia-auth:
-    specifier: ^1.5.0
-    version: 1.5.0
+    specifier: ^1.7.0
+    version: 1.7.0
   socket.io-client:
     specifier: ^4.6.1
     version: 4.6.1
 
 devDependencies:
   '@builder.io/qwik':
-    specifier: 0.105.0
-    version: 0.105.0(undici@5.21.0)
+    specifier: 1.1.4
+    version: 1.1.4(undici@5.21.0)
   '@builder.io/qwik-city':
-    specifier: 0.105.0
-    version: 0.105.0
+    specifier: 1.1.4
+    version: 1.1.4
   '@types/bcryptjs':
     specifier: ^2.4.2
     version: 2.4.2
@@ -46,8 +46,8 @@ devDependencies:
     specifier: 8.36.0
     version: 8.36.0
   eslint-plugin-qwik:
-    specifier: 0.105.0
-    version: 0.105.0(eslint@8.36.0)
+    specifier: 1.1.4
+    version: 1.1.4(eslint@8.36.0)
   postcss:
     specifier: ^8.4.21
     version: 8.4.23
@@ -55,8 +55,8 @@ devDependencies:
     specifier: 2.8.8
     version: 2.8.8
   prisma:
-    specifier: ^4.13.0
-    version: 4.13.0
+    specifier: ^4.14.0
+    version: 4.14.0
   tailwindcss:
     specifier: ^3.3.2
     version: 3.3.2
@@ -1294,8 +1294,8 @@ packages:
       to-fast-properties: 2.0.0
     dev: true
 
-  /@builder.io/qwik-city@0.105.0:
-    resolution: {integrity: sha512-478jiDaENzXC3Ad6jNtFT+lzbMi9OsFOKKnKsQKdc0Tcf5VtxZH9TG52tN4DIvohs+WNTY3sC3gZdX2MtQrrdw==}
+  /@builder.io/qwik-city@1.1.4:
+    resolution: {integrity: sha512-J6EAZN2vXaoou5PBC3GS6Z0RTC4jzXXNup+gLQou4yMVPnnI+i4g1bD1240Uo0VDhTLJQkBHxKWMWwRqgckISA==}
     engines: {node: '>=16.8.0 <18.0.0 || >=18.11'}
     dependencies:
       '@mdx-js/mdx': 2.3.0
@@ -1307,8 +1307,8 @@ packages:
       - supports-color
     dev: true
 
-  /@builder.io/qwik@0.105.0(undici@5.21.0):
-    resolution: {integrity: sha512-Lqnvl30BZBcPXAeKMedqmzaHs26ruHp+omcXWexSbQPdT5wev14SGBvn0QgqaGcIi5L0tacUMBv0k9lpsB/T2w==}
+  /@builder.io/qwik@1.1.4(undici@5.21.0):
+    resolution: {integrity: sha512-FSbe2GcUBptAXMAHfN+oGUpnb3nZXzup2EYlza61bAfgWSx9SryOwNULyROis3mu7Ywdua3w6VKvCWOFdovz2w==}
     engines: {node: '>=16.8.0 <18.0.0 || >=18.11'}
     hasBin: true
     peerDependencies:
@@ -2066,14 +2066,14 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@lucia-auth/adapter-prisma@2.0.0(@prisma/client@4.13.0)(lucia-auth@1.5.0):
+  /@lucia-auth/adapter-prisma@2.0.0(@prisma/client@4.14.0)(lucia-auth@1.7.0):
     resolution: {integrity: sha512-8qxEcoVNJDbK8zXzyMK/4SHnLTaih0oNjTfp7l4ndRg5WI+eMgP3N0OUGQVaq3C5N0iIfkXxgj/ZGH8ZidwVeQ==}
     peerDependencies:
       '@prisma/client': ^4.2.0
       lucia-auth: ^1.3.0
     dependencies:
-      '@prisma/client': 4.13.0(prisma@4.13.0)
-      lucia-auth: 1.5.0
+      '@prisma/client': 4.14.0(prisma@4.14.0)
+      lucia-auth: 1.7.0
     dev: false
 
   /@mapbox/node-pre-gyp@1.0.10:
@@ -2162,8 +2162,8 @@ packages:
       json-parse-even-better-errors: 2.3.1
     dev: true
 
-  /@prisma/client@4.13.0(prisma@4.13.0):
-    resolution: {integrity: sha512-YaiiICcRB2hatxsbnfB66uWXjcRw3jsZdlAVxmx0cFcTc/Ad/sKdHCcWSnqyDX47vAewkjRFwiLwrOUjswVvmA==}
+  /@prisma/client@4.14.0(prisma@4.14.0):
+    resolution: {integrity: sha512-MK/XaA2sFdfaOa7I9MjNKz6dxeIEdeZlnpNRoF2w3JuRLlFJLkpp6cD3yaqw2nUUhbrn3Iqe3ZpVV+VuGGil7Q==}
     engines: {node: '>=14.17'}
     requiresBuild: true
     peerDependencies:
@@ -2172,16 +2172,16 @@ packages:
       prisma:
         optional: true
     dependencies:
-      '@prisma/engines-version': 4.13.0-50.1e7af066ee9cb95cf3a403c78d9aab3e6b04f37a
-      prisma: 4.13.0
+      '@prisma/engines-version': 4.14.0-67.d9a4c5988f480fa576d43970d5a23641aa77bc9c
+      prisma: 4.14.0
     dev: false
 
-  /@prisma/engines-version@4.13.0-50.1e7af066ee9cb95cf3a403c78d9aab3e6b04f37a:
-    resolution: {integrity: sha512-fsQlbkhPJf08JOzKoyoD9atdUijuGBekwoOPZC3YOygXEml1MTtgXVpnUNchQlRSY82OQ6pSGQ9PxUe4arcSLQ==}
+  /@prisma/engines-version@4.14.0-67.d9a4c5988f480fa576d43970d5a23641aa77bc9c:
+    resolution: {integrity: sha512-3jum8/YSudeSN0zGW5qkpz+wAN2V/NYCQ+BPjvHYDfWatLWlQkqy99toX0GysDeaUoBIJg1vaz2yKqiA3CFcQw==}
     dev: false
 
-  /@prisma/engines@4.13.0:
-    resolution: {integrity: sha512-HrniowHRZXHuGT9XRgoXEaP2gJLXM5RMoItaY2PkjvuZ+iHc0Zjbm/302MB8YsPdWozAPHHn+jpFEcEn71OgPw==}
+  /@prisma/engines@4.14.0:
+    resolution: {integrity: sha512-PDNlhP/1vyTgmNyiucGqGCdXIp7HIkkvKO50si3y3PcceeHvqtiKPaH1iJdz63jCWMVMbj2MElSxXPOeBvEVIQ==}
     requiresBuild: true
 
   /@remix-run/router@1.5.0:
@@ -4102,8 +4102,8 @@ packages:
       source-map: 0.6.1
     dev: true
 
-  /eslint-plugin-qwik@0.105.0(eslint@8.36.0):
-    resolution: {integrity: sha512-g6jfSVnp1Yq8pht9i5i1C2bA9FKTCIK4ORaswuOcOkiKV7JM2QaDw/mkJRDjUiSwmdlLCnMA6LUgXZDO7w5tpQ==}
+  /eslint-plugin-qwik@1.1.4(eslint@8.36.0):
+    resolution: {integrity: sha512-RHeH/OwYu6iLxVxyuHshCRiIetmrsEo585yGC8ZRTuIa25zCUbD54w/KumXU6u4W5t00NxxrDwt3+ZH206hQEA==}
     engines: {node: '>=16'}
     peerDependencies:
       eslint: '>= 8'
@@ -5437,8 +5437,8 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
-  /lucia-auth@1.5.0:
-    resolution: {integrity: sha512-lLgLvyJcCjK+dYwJrgzPWGjT+YGgl7JF13TahXKozf/C3KkX/fFzOAUkY0h5xnm585lJE5BBrQIXAXa+rDzW6g==}
+  /lucia-auth@1.7.0:
+    resolution: {integrity: sha512-JisZE50dlvVdX726TSxUH0uoI/bwBrgSjO/+Ts/Yrk7TseKtcK8ezDNCAYUCI1XK3PHm37jgobklELpxeAmYLw==}
     dev: false
 
   /magic-string@0.25.9:
@@ -6610,13 +6610,13 @@ packages:
       parse-ms: 2.1.0
     dev: true
 
-  /prisma@4.13.0:
-    resolution: {integrity: sha512-L9mqjnSmvWIRCYJ9mQkwCtj4+JDYYTdhoyo8hlsHNDXaZLh/b4hR0IoKIBbTKxZuyHQzLopb/+0Rvb69uGV7uA==}
+  /prisma@4.14.0:
+    resolution: {integrity: sha512-+5dMl1uxMQb4RepndY6AwR9xi1cDcaGFICu+ws6/Nmgt93mFPNj8tYxSfTdmfg+rkNrUId9rk/Ac2vTgLe/oXA==}
     engines: {node: '>=14.17'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      '@prisma/engines': 4.13.0
+      '@prisma/engines': 4.14.0
 
   /process-nextick-args@2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
