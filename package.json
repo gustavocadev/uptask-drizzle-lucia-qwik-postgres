@@ -22,8 +22,8 @@
     "qwik": "qwik"
   },
   "devDependencies": {
-    "@builder.io/qwik": "0.105.0",
-    "@builder.io/qwik-city": "0.105.0",
+    "@builder.io/qwik": "1.1.4",
+    "@builder.io/qwik-city": "1.1.4",
     "@types/bcryptjs": "^2.4.2",
     "@types/eslint": "8.21.3",
     "@types/node": "^18.15.7",
@@ -31,10 +31,10 @@
     "@typescript-eslint/parser": "5.55.0",
     "autoprefixer": "^10.4.14",
     "eslint": "8.36.0",
-    "eslint-plugin-qwik": "0.105.0",
+    "eslint-plugin-qwik": "1.1.4",
     "postcss": "^8.4.21",
     "prettier": "2.8.8",
-    "prisma": "^4.13.0",
+    "prisma": "^4.14.0",
     "tailwindcss": "^3.3.2",
     "typescript": "5.0.4",
     "undici": "5.21.0",
@@ -44,9 +44,9 @@
   },
   "dependencies": {
     "@lucia-auth/adapter-prisma": "^2.0.0",
-    "@prisma/client": "^4.13.0",
+    "@prisma/client": "^4.14.0",
     "date-fns": "^2.29.3",
-    "lucia-auth": "^1.5.0",
+    "lucia-auth": "^1.7.0",
     "socket.io-client": "^4.6.1"
   }
 }
