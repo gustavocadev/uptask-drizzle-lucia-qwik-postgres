@@ -10,6 +10,11 @@ export default defineConfig(() => {
       headers: {
         'Cache-Control': 'public, max-age=600',
       },
+      resolve: {
+       alias: {
+          ".prisma/client/index-browser": "./node_modules/.prisma/client/index-browser.js"
+        },
+      },
     }
   };
 });
