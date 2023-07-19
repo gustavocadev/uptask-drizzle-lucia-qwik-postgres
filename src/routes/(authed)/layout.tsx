@@ -1,5 +1,5 @@
 import { component$, Slot } from '@builder.io/qwik';
-import { routeLoader$ } from '@builder.io/qwik-city';
+import { routeAction$, routeLoader$ } from '@builder.io/qwik-city';
 import { Header } from '~/components/ui/Header';
 import { Sidebar } from '~/components/ui/Sidebar';
 import { auth } from '~/lib/lucia';
@@ -15,6 +15,18 @@ export const useUserDataLoader = routeLoader$(async (event) => {
   return {
     name: user.name,
   };
+});
+
+export const useSignoutAction = routeAction$(async (values, event) => {
+  const authRequest = auth.handleRequest(event);
+  const { session } = await authRequest.validateUser();
+
+  if (!session) throw event.redirect(303, '/');
+
+  auth.invalidateSession(session.sessionId);
+  authRequest.setSession(null);
+
+  throw event.redirect(303, '/');
 });
 
 export default component$(() => {
