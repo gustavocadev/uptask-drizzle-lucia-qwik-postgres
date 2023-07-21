@@ -6,30 +6,10 @@ import {
   useSignal,
   useTask$,
 } from '@builder.io/qwik';
-import { Form, Link, globalAction$, zod$, z } from '@builder.io/qwik-city';
+import { Link } from '@builder.io/qwik-city';
 import type { Task as ITask } from '@prisma/client';
-import { prisma } from '~/lib/prisma';
 import * as dateFns from 'date-fns';
 import { SocketContext } from '~/context/socket/SocketContext';
-
-export const useActionToggleState = globalAction$(
-  async (values) => {
-    const taskState = JSON.parse(values.taskState);
-    await prisma.task.update({
-      where: {
-        id: values.taskId,
-      },
-      data: {
-        state: taskState,
-      },
-    });
-    console.log({ values });
-  },
-  zod$({
-    taskId: z.string(),
-    taskState: z.string(),
-  })
-);
 
 export interface TaskProps {
   task: ITask;
@@ -38,7 +18,6 @@ export interface TaskProps {
 }
 
 export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
-  const actionToggleState = useActionToggleState();
   const spanishDateFormat = useSignal('');
   const { socket } = useContext(SocketContext);
 
@@ -62,6 +41,17 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
     const task = JSON.parse(taskStr);
 
     socket.value?.emit('delete-task', task);
+  });
+
+  const handleChangeState = $((e: QwikSubmitEvent<HTMLFormElement>) => {
+    const target = e.target as HTMLFormElement;
+    const formData = new FormData(target);
+
+    const taskStr = formData.get('task') as string;
+    const taskState = formData.get('taskState') as string;
+
+    const task = JSON.parse(taskStr);
+    socket.value?.emit('update-task-state', { task, taskState });
   });
 
   return (
@@ -89,8 +79,8 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
         )}
 
         {task.state ? (
-          <Form action={actionToggleState}>
-            <input type="hidden" name="taskId" value={task.id} />
+          <form onSubmit$={handleChangeState} preventdefault:submit>
+            <input type="hidden" name="task" value={JSON.stringify(task)} />
             <input type="hidden" name="taskState" value={'false'} />
             <button
               type="submit"
@@ -98,10 +88,10 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
             >
               Completa
             </button>
-          </Form>
+          </form>
         ) : (
-          <Form action={actionToggleState}>
-            <input type="hidden" name="taskId" value={task.id} />
+          <form onSubmit$={handleChangeState} preventdefault:submit>
+            <input type="hidden" name="task" value={JSON.stringify(task)} />
             <input type="hidden" name="taskState" value={'true'} />
 
             <button
@@ -110,7 +100,7 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
             >
               Incompleta
             </button>
-          </Form>
+          </form>
         )}
 
         {authorId === userAuthId && (
