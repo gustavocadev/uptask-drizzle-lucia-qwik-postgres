@@ -5,14 +5,8 @@ import {
   ServiceWorkerRegister,
 } from '@builder.io/qwik-city';
 import { RouterHead } from './components/router-head/router-head';
-
 import './global.css';
 
-// type SocketClient = {
-// 	socket: Socket | null
-// }
-
-// export const SocketContext = createContextId<SocketClient>('SocketContext')
 
 export default component$(() => {
   /**
@@ -21,14 +15,6 @@ export default component$(() => {
    *
    * Dont remove the `<head>` and `<body>` elements.
    */
-
-  // my global state
-  // const socketState = useStore<SocketClient>({
-  // 	socket: null,
-  // })
-
-  // my providers
-  // useContextProvider(SocketContext, socketState)
 
   return (
     <QwikCityProvider>
