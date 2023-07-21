@@ -89,6 +89,17 @@ io.on('connection', async (socket) => {
     const all_tasks = await prisma.task.findMany();
     io.emit('current-tasks', all_tasks);
   });
+
+  socket.on('delete-task', async (taskId) => {
+    await prisma.task.delete({
+      where: {
+        id: taskId,
+      },
+    });
+
+    const all_tasks = await prisma.task.findMany();
+    io.emit('current-tasks', all_tasks);
+  });
 });
 /* ---- SOCKET IO ----*/
 

@@ -1,8 +1,16 @@
-import { component$, useSignal, useTask$ } from '@builder.io/qwik';
+import {
+  $,
+  type QwikSubmitEvent,
+  component$,
+  useContext,
+  useSignal,
+  useTask$,
+} from '@builder.io/qwik';
 import { Form, Link, globalAction$, zod$, z } from '@builder.io/qwik-city';
 import type { Task as ITask } from '@prisma/client';
 import { prisma } from '~/lib/prisma';
 import * as dateFns from 'date-fns';
+import { SocketContext } from '~/context/socket/SocketContext';
 
 export const useActionToggleState = globalAction$(
   async (values) => {
@@ -32,6 +40,7 @@ export interface TaskProps {
 export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
   const actionToggleState = useActionToggleState();
   const spanishDateFormat = useSignal('');
+  const { socket } = useContext(SocketContext);
 
   // runs on the server which means it runs before the render the component thanks to resumability
   useTask$(() => {
@@ -42,6 +51,16 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
       new Date(task.deliveryDate),
       'dd/MM/yyyy'
     );
+  });
+
+  const handleSubmit = $((e: QwikSubmitEvent<HTMLFormElement>) => {
+    const target = e.target as HTMLFormElement;
+    const formData = new FormData(target);
+
+    const taskId = formData.get('taskId');
+    console.log({ taskId });
+
+    socket.value?.emit('delete-task', taskId);
   });
 
   return (
@@ -94,12 +113,16 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
         )}
 
         {authorId === userAuthId && (
-          <button
-            type="button"
-            class="bg-red-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
-          >
-            Eliminar
-          </button>
+          <form onSubmit$={handleSubmit} preventdefault:submit>
+            <input type="hidden" name="taskId" value={task.id} />
+            <button
+              type="submit"
+              name="taskId"
+              class="bg-red-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
+            >
+              Eliminar
+            </button>
+          </form>
         )}
       </div>
     </div>
