@@ -57,10 +57,11 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
     const target = e.target as HTMLFormElement;
     const formData = new FormData(target);
 
-    const taskId = formData.get('taskId');
-    console.log({ taskId });
+    const taskStr = formData.get('task') as string;
 
-    socket.value?.emit('delete-task', taskId);
+    const task = JSON.parse(taskStr);
+
+    socket.value?.emit('delete-task', task);
   });
 
   return (
@@ -114,10 +115,9 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
 
         {authorId === userAuthId && (
           <form onSubmit$={handleSubmit} preventdefault:submit>
-            <input type="hidden" name="taskId" value={task.id} />
+            <input type="hidden" name="task" value={JSON.stringify(task)} />
             <button
               type="submit"
-              name="taskId"
               class="bg-red-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
             >
               Eliminar
