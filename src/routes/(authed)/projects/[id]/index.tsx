@@ -82,7 +82,7 @@ export default component$(() => {
     if (!socket.value) return;
 
     // only execute every time the socket changes
-    socket.value.on('current-tasks', (payload) => {
+    socket.value.on('current-tasks', (payload: ITask[]) => {
       tasks.value = payload;
     });
   });
