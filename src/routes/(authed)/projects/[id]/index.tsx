@@ -1,5 +1,5 @@
 import { component$, useContext, useSignal, useTask$ } from '@builder.io/qwik';
-import { Link, routeLoader$ } from '@builder.io/qwik-city';
+import { Link, routeLoader$, useLocation } from '@builder.io/qwik-city';
 import type { Task as ITask } from '@prisma/client';
 import Contributor from '~/components/project/Contributor';
 import { Task } from '~/components/task/Task';
@@ -70,10 +70,19 @@ export default component$(() => {
   // const { tasks } = useContext(TaskContext);
   const tasks = useSignal<ITask[]>([]);
   const { socket } = useContext(SocketContext);
+  const loc = useLocation();
 
   // this task will be executed only once
   useTask$(() => {
     tasks.value = tasksData.value.tasks;
+  });
+
+  // yo join the room that means that you will receive the messages from that room
+  useTask$(({ track }) => {
+    // we need to track the socket because it will change !important
+    track(() => socket.value);
+    if (!socket.value) return;
+    socket.value.emit('open-project', loc.params.id);
   });
 
   // this task will be executed every time the socket changes
