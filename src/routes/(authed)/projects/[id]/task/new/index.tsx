@@ -1,41 +1,11 @@
-import { component$ } from '@builder.io/qwik';
 import {
-  Form,
-  routeAction$,
-  routeLoader$,
-  z,
-  zod$,
-} from '@builder.io/qwik-city';
-import { prisma } from '~/lib/prisma';
-import * as dateFns from 'date-fns';
-
-export const useActionNewTask = routeAction$(
-  async (values, request) => {
-    const parseDateToUTC = dateFns.parse(
-      values.dueDate,
-      'yyyy-MM-dd',
-      new Date()
-    );
-
-    await prisma.task.create({
-      data: {
-        deliveryDate: parseDateToUTC,
-        description: values.description,
-        name: values.name,
-        priority: values.priority,
-        projectId: values.projectId,
-      },
-    });
-    throw request.redirect(303, `/projects/${values.projectId}`);
-  },
-  zod$({
-    name: z.string().min(1).max(100),
-    description: z.string().min(1).max(1000),
-    priority: z.string().min(1).max(100),
-    dueDate: z.string().min(1).max(100),
-    projectId: z.string(),
-  })
-);
+  $,
+  type QwikSubmitEvent,
+  component$,
+  useContext,
+} from '@builder.io/qwik';
+import { routeLoader$, useNavigate } from '@builder.io/qwik-city';
+import { SocketContext } from '~/context/socket/SocketContext';
 
 export const useLoaderTask = routeLoader$(({ params }) => {
   return {
@@ -46,8 +16,26 @@ export const useLoaderTask = routeLoader$(({ params }) => {
 const priorities = ['low', 'medium', 'high'];
 
 export default component$(() => {
-  const actionNewTask = useActionNewTask();
+  // const actionNewTask = useActionNewTask();
   const loaderTask = useLoaderTask();
+  const { socket } = useContext(SocketContext);
+  const nav = useNavigate();
+
+  const handleSubmit = $(async (e: QwikSubmitEvent<HTMLFormElement>) => {
+    const target = e.target as HTMLFormElement;
+    const formData = new FormData(target);
+    const task = {
+      name: formData.get('name'),
+      description: formData.get('description'),
+      priority: formData.get('priority'),
+      dueDate: formData.get('dueDate'),
+      projectId: formData.get('projectId'),
+    };
+
+    socket.value?.emit('new-task', task);
+    await nav(`/projects/${loaderTask.value.projectId}`);
+  });
+
   return (
     <>
       <div class="sm:flex sm:items-start">
@@ -55,7 +43,7 @@ export default component$(() => {
           <h3 class="text-4xl leading-6 font-bold text-gray-900">
             Crear Tarea
           </h3>
-          <Form class="mt-10" action={actionNewTask}>
+          <form class="mt-10" onSubmit$={handleSubmit} preventdefault:submit>
             <div class="mb-5">
               <label
                 for="name"
@@ -136,7 +124,7 @@ export default component$(() => {
             >
               Crear
             </button>
-          </Form>
+          </form>
         </div>
       </div>
     </>
