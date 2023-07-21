@@ -55,6 +55,7 @@ export const useLoaderUserData = routeLoader$(async (event) => {
 export default component$(() => {
   const createProjectAction = useCreateProjectAction();
   const userData = useLoaderUserData();
+
   return (
     <>
       <h1 class="text-4xl font-black">New Project</h1>
