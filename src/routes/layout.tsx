@@ -1,5 +1,13 @@
-import { component$, Slot } from '@builder.io/qwik'
+import { component$, Slot } from '@builder.io/qwik';
+import { SocketProvider } from '~/context/socket/SocketProvider';
+import { TaskProvider } from '~/context/task/TaskProvider';
 
 export default component$(() => {
-	return <Slot />
-})
+  return (
+    <SocketProvider>
+      <TaskProvider>
+        <Slot />
+      </TaskProvider>
+    </SocketProvider>
+  );
+});
