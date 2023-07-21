@@ -1,6 +1,6 @@
 import { component$, useContext, useSignal, useTask$ } from '@builder.io/qwik';
 import { Link, routeLoader$ } from '@builder.io/qwik-city';
-import { Task as ITask } from '@prisma/client';
+import type { Task as ITask } from '@prisma/client';
 import Contributor from '~/components/project/Contributor';
 import { Task } from '~/components/task/Task';
 import { SocketContext } from '~/context/socket/SocketContext';
@@ -49,19 +49,40 @@ export const useLoaderUserAuth = routeLoader$(async ({ request, cookie }) => {
   };
 });
 
+export const useTasks = routeLoader$(async ({ params }) => {
+  const tasks = await prisma.task.findMany({
+    where: {
+      projectId: params.id,
+    },
+  });
+
+  return {
+    tasks,
+  };
+});
+
 export default component$(() => {
   const loaderProject = useLoaderProject();
   const loaderContributors = useLoaderContributors();
   const loaderUserAuth = useLoaderUserAuth();
+  const tasksData = useTasks();
 
   // const { tasks } = useContext(TaskContext);
   const tasks = useSignal<ITask[]>([]);
   const { socket } = useContext(SocketContext);
 
+  // this task will be executed only once
+  useTask$(() => {
+    tasks.value = tasksData.value.tasks;
+  });
+
+  // this task will be executed every time the socket changes
   useTask$(({ track }) => {
     track(() => socket.value);
+    if (!socket.value) return;
 
-    socket.value?.on('current-tasks', (payload) => {
+    // only execute every time the socket changes
+    socket.value.on('current-tasks', (payload) => {
       tasks.value = payload;
     });
   });
