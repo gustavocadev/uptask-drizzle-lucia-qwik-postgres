@@ -61,14 +61,20 @@ const httpServer = createServer(app);
 // And then attach the socket.io server to the HTTP server
 const io = new Server(httpServer);
 
+const emitCurrentTasks = async (projectId: string) => {
+  const all_tasks = await prisma.task.findMany();
+  io.to(projectId).emit('current-tasks', all_tasks);
+};
 // Then you can use `io` to listen the `connection` event and get a socket
 // from a client
 io.on('connection', async (socket) => {
-  // from this point you are on the WS connection with a specific client
-  socket.emit('confirmation', 'connected! 👋');
-  const all_tasks = await prisma.task.findMany();
-  io.emit('current-tasks', all_tasks);
+  socket.on('open-project', (projectId: string) => {
+    // with the join method you can join a specific room, then we can use `to` for example to send a message to a specific room
+    console.log(projectId);
+    socket.join(projectId);
+  });
 
+  // CREATE TASK
   socket.on('new-task', async (task) => {
     const parseDateToUTC = dateFns.parse(
       task.dueDate,
@@ -86,19 +92,46 @@ io.on('connection', async (socket) => {
       },
     });
 
-    const all_tasks = await prisma.task.findMany();
-    io.emit('current-tasks', all_tasks);
+    await emitCurrentTasks(task.projectId);
   });
 
-  socket.on('delete-task', async (taskId) => {
+  // DELETE TASK
+  socket.on('delete-task', async (task) => {
+    console.log(task);
     await prisma.task.delete({
       where: {
-        id: taskId,
+        id: task.id,
       },
     });
 
-    const all_tasks = await prisma.task.findMany();
-    io.emit('current-tasks', all_tasks);
+    await emitCurrentTasks(task.projectId);
+  });
+
+  // UPDATE TASK
+  socket.on('update-task', async (task) => {
+    const parseDateToUTC = dateFns.parse(
+      task.dueDate,
+      'yyyy-MM-dd',
+      new Date()
+    );
+
+    await prisma.task.update({
+      where: {
+        id: task.taskId,
+      },
+      data: {
+        deliveryDate: parseDateToUTC,
+        description: task.description,
+        name: task.name,
+        priority: task.priority,
+      },
+    });
+
+    await emitCurrentTasks(task.projectId);
+  });
+
+  socket.on('toggle-task-state', (task) => {
+    console.log(task);
   });
 });
 /* ---- SOCKET IO ----*/
