@@ -61,7 +61,7 @@ export const useActionAddContributor = routeAction$(
     });
 
     console.log({ userToAdd });
-    return request.redirect(303, `/projects/${values.projectId}`);
+    throw request.redirect(303, `/projects/${values.projectId}`);
   },
   zod$({
     userId: z.string(),
