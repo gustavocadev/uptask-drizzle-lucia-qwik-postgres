@@ -7,7 +7,7 @@
 - [x] Add collaborators
 - [x] Create Tasks, complete and delete tasks
 - [x] Delete colaborators
-- [ ] Add Socket.io
+- [x] Add Socket.io
 
 ## Express Server
 
