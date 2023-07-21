@@ -130,8 +130,18 @@ io.on('connection', async (socket) => {
     await emitCurrentTasks(task.projectId);
   });
 
-  socket.on('toggle-task-state', (task) => {
-    console.log(task);
+  socket.on('update-task-state', async (payload) => {
+    const taskState = JSON.parse(payload.taskState);
+    await prisma.task.update({
+      where: {
+        id: payload.task.id,
+      },
+      data: {
+        state: taskState,
+      },
+    });
+
+    await emitCurrentTasks(payload.task.projectId);
   });
 });
 /* ---- SOCKET IO ----*/
