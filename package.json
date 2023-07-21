@@ -28,8 +28,6 @@
   "devDependencies": {
     "@builder.io/qwik": "1.2.6",
     "@builder.io/qwik-city": "1.2.6",
-    "@prisma/client": "4.16.1",
-    "@types/bcryptjs": "^2.4.2",
     "@types/compression": "^1.7.2",
     "@types/eslint": "8.21.3",
     "@types/express": "4.17.17",
@@ -52,8 +50,8 @@
   },
   "dependencies": {
     "@lucia-auth/adapter-prisma": "^2.0.0",
-    "@prisma/client": "^4.15.0",
-    "date-fns": "^2.29.3",
+    "@prisma/client": "^4.16.1",
+    "date-fns": "^2.30.0",
     "lucia-auth": "^1.8.0",
     "socket.io": "^4.7.1",
     "socket.io-client": "^4.7.1"
