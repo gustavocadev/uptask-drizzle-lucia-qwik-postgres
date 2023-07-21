@@ -1,7 +1,9 @@
-import { component$ } from '@builder.io/qwik';
+import { component$, useContext, useSignal, useTask$ } from '@builder.io/qwik';
 import { Link, routeLoader$ } from '@builder.io/qwik-city';
+import { Task as ITask } from '@prisma/client';
 import Contributor from '~/components/project/Contributor';
 import { Task } from '~/components/task/Task';
+import { SocketContext } from '~/context/socket/SocketContext';
 import { auth } from '~/lib/lucia';
 import { prisma } from '~/lib/prisma';
 
@@ -15,24 +17,6 @@ export const useLoaderProject = routeLoader$(async ({ params }) => {
 
   return {
     project,
-  };
-});
-
-export const useLoaderTasks = routeLoader$(async ({ params }) => {
-  // all the tasks that belong to the project
-  const tasks = await prisma.task.findMany({
-    where: {
-      projectId: params.id,
-    },
-  });
-
-  // const tasks = all_tasks.map((task) => ({
-  //   ...task,
-  //   deliveryDate: dateFns.format(new Date(task.deliveryDate), 'dd/MM/yyyy'),
-  // })) satisfies ITask;
-
-  return {
-    tasks,
   };
 });
 
@@ -67,9 +51,21 @@ export const useLoaderUserAuth = routeLoader$(async ({ request, cookie }) => {
 
 export default component$(() => {
   const loaderProject = useLoaderProject();
-  const loaderTasks = useLoaderTasks();
   const loaderContributors = useLoaderContributors();
   const loaderUserAuth = useLoaderUserAuth();
+
+  // const { tasks } = useContext(TaskContext);
+  const tasks = useSignal<ITask[]>([]);
+  const { socket } = useContext(SocketContext);
+
+  useTask$(({ track }) => {
+    track(() => socket.value);
+
+    socket.value?.on('current-tasks', (payload) => {
+      tasks.value = payload;
+    });
+  });
+
   return (
     <>
       <div class="flex justify-between">
@@ -131,8 +127,8 @@ export default component$(() => {
 
       <p class="font-bold text-xl m4-10">Tareas del proyecto</p>
       <div class="bg-white shadow mt-10 rounded-lg">
-        {loaderTasks.value?.tasks.length ? (
-          loaderTasks.value?.tasks.map((task) => (
+        {tasks.value.length ? (
+          tasks.value.map((task) => (
             <Task
               key={task.id}
               task={task}
