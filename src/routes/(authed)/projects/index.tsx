@@ -9,7 +9,7 @@ export const useLoaderProjects = routeLoader$(async (event) => {
   const { user } = await authRequest.validateUser();
   if (!user) return { error: 'Not logged in' };
 
-  console.log({ user });
+  // console.log({ user });
 
   // get all the projects that the user is the author or contributor
   const projectsByUser = await prisma.project.findMany({
