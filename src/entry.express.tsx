@@ -62,7 +62,11 @@ const httpServer = createServer(app);
 const io = new Server(httpServer);
 
 const emitCurrentTasks = async (projectId: string) => {
-  const all_tasks = await prisma.task.findMany();
+  const all_tasks = await prisma.task.findMany({
+    include: {
+      userWhoCompletedTask: true,
+    },
+  });
   io.to(projectId).emit('current-tasks', all_tasks);
 };
 // Then you can use `io` to listen the `connection` event and get a socket
@@ -138,6 +142,7 @@ io.on('connection', async (socket) => {
       },
       data: {
         state: taskState,
+        userWhoCompletedTaskId: payload.userId,
       },
     });
 

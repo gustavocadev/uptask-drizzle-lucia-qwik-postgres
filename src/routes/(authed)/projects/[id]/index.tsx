@@ -1,11 +1,12 @@
 import { component$, useContext, useSignal, useTask$ } from '@builder.io/qwik';
 import { Link, routeLoader$, useLocation } from '@builder.io/qwik-city';
-import type { Task as ITask } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import Contributor from '~/components/project/Contributor';
 import { Task } from '~/components/task/Task';
 import { SocketContext } from '~/context/socket/SocketContext';
 import { auth } from '~/lib/lucia';
 import { prisma } from '~/lib/prisma';
+// import type { Task as ITask } from '@prisma/client';
 
 export const useLoaderProject = routeLoader$(async ({ params }) => {
   // the project data
@@ -49,15 +50,28 @@ export const useLoaderUserAuth = routeLoader$(async ({ request, cookie }) => {
   };
 });
 
-export const useTasks = routeLoader$(async ({ params }) => {
+// get merge types
+export type TasksWithUserWhoCompletedTask = Prisma.TaskGetPayload<{
+  include: {
+    userWhoCompletedTask: true;
+  };
+}>;
+
+export const useTasks = routeLoader$<{
+  tasks: TasksWithUserWhoCompletedTask[];
+}>(async ({ params }) => {
+  // all the tasks that belong to the project with the user who completed the task
   const tasks = await prisma.task.findMany({
     where: {
       projectId: params.id,
     },
+    include: {
+      userWhoCompletedTask: true,
+    },
   });
 
   return {
-    tasks,
+    tasks: tasks,
   };
 });
 
@@ -68,10 +82,9 @@ export default component$(() => {
   const tasksData = useTasks();
 
   // const { tasks } = useContext(TaskContext);
-  const tasks = useSignal<ITask[]>([]);
+  const tasks = useSignal<TasksWithUserWhoCompletedTask[]>([]);
   const { socket } = useContext(SocketContext);
   const loc = useLocation();
-
   // this task will be executed only once
   useTask$(() => {
     tasks.value = tasksData.value.tasks;
@@ -91,11 +104,13 @@ export default component$(() => {
     if (!socket.value) return;
 
     // only execute every time the socket changes
-    socket.value.on('current-tasks', (payload: ITask[]) => {
-      tasks.value = payload;
-    });
+    socket.value.on(
+      'current-tasks',
+      (payload: TasksWithUserWhoCompletedTask[]) => {
+        tasks.value = payload;
+      }
+    );
   });
-
   return (
     <>
       <div class="flex justify-between">
