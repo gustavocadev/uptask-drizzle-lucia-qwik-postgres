@@ -7,12 +7,13 @@ import {
   useTask$,
 } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
-import type { Task as ITask } from '@prisma/client';
 import * as dateFns from 'date-fns';
 import { SocketContext } from '~/context/socket/SocketContext';
+import { useUserDataLoader } from '~/routes/(authed)/layout';
+import type { TasksWithUserWhoCompletedTask } from '~/routes/(authed)/projects/[id]';
 
 export interface TaskProps {
-  task: ITask;
+  task: TasksWithUserWhoCompletedTask;
   authorId: string;
   userAuthId: string;
 }
@@ -20,6 +21,7 @@ export interface TaskProps {
 export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
   const spanishDateFormat = useSignal('');
   const { socket } = useContext(SocketContext);
+  const userData = useUserDataLoader();
 
   // runs on the server which means it runs before the render the component thanks to resumability
   useTask$(() => {
@@ -51,7 +53,9 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
     const taskState = formData.get('taskState') as string;
 
     const task = JSON.parse(taskStr);
-    socket.value?.emit('update-task-state', { task, taskState });
+
+    const userId = userData.value.user.userId;
+    socket.value?.emit('update-task-state', { task, taskState, userId });
   });
 
   return (
@@ -63,7 +67,7 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
         <p class="mb-1 text-gray-600">Priority: {task.priority}</p>
         {task.state && (
           <p class="text-xs bg-green-600 uppercase p-1 rounded-lg text-white">
-            Completada por: {task.name}
+            Completada por: {task.userWhoCompletedTask?.name}
           </p>
         )}
       </div>
