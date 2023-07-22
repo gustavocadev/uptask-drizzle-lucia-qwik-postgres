@@ -45,7 +45,7 @@ export default component$(() => {
     const formData = new FormData(target);
 
     const task = Object.fromEntries(formData.entries());
-    console.log({ task });
+    // console.log({ task });
 
     socket.value?.emit('update-task', task);
     await nav('/projects/' + loaderTask.value.task?.projectId);
