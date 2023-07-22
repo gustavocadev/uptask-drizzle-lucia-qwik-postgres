@@ -8,7 +8,7 @@ export const Sidebar = component$<Props>(() => {
   const userDataLoader = useUserDataLoader();
   return (
     <aside class="md:w-80 lg:w-96 px-5 py-10">
-      <p class="text-xl font-bold">Hola: {userDataLoader.value.name}</p>
+      <p class="text-xl font-bold">Hola: {userDataLoader.value.user.name}</p>
 
       <Link
         href="/projects/new-project"
