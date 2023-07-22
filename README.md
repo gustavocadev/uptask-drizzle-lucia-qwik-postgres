@@ -1,4 +1,4 @@
-# Qwik City App ⚡️
+# Qwik City App ⚡️ + Socket.io + Lucia Auth + Prisma with MongoDB
 
 \### Project status
 
