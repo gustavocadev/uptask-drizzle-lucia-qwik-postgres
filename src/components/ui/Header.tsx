@@ -1,6 +1,18 @@
 import { component$ } from '@builder.io/qwik';
-import { Form, Link } from '@builder.io/qwik-city';
-import { useSignoutAction } from '~/routes/(authed)/layout';
+import { Form, Link, globalAction$ } from '@builder.io/qwik-city';
+import { auth } from '~/lib/lucia';
+
+export const useSignoutAction = globalAction$(async (values, event) => {
+  const authRequest = auth.handleRequest(event);
+  const { session } = await authRequest.validateUser();
+
+  if (!session) throw event.redirect(303, '/');
+
+  auth.invalidateSession(session.sessionId);
+  authRequest.setSession(null);
+
+  throw event.redirect(303, '/');
+});
 
 export const Header = component$(() => {
   const signoutAction = useSignoutAction();
