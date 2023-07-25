@@ -16,6 +16,8 @@ export const useActionSearchUsers = routeAction$(
       },
     });
 
+    console.log({ user });
+
     if (!user) {
       return {
         error: 'User not found',
@@ -105,6 +107,7 @@ export default component$(() => {
             >
               Email Colaborador
             </label>
+
             <input
               type="email"
               id="email"
@@ -114,11 +117,12 @@ export default component$(() => {
             />
           </div>
 
-          <input
+          <button
             type="submit"
             class="bg-sky-600 hover:bg-sky-700 w-full p-3 text-white uppercase font-bold cursor-pointer transition-colors rounded text-sm"
-            value="Buscar Colaborador"
-          />
+          >
+            Buscar Colaborador
+          </button>
         </Form>
       </div>
 
@@ -142,6 +146,7 @@ export default component$(() => {
                 name="userId"
                 value={actionSearchUsers.value.user.id}
               />
+
               <button
                 type="submit"
                 class="bg-slate-500 px-5 py-2 rounded-lg uppercase text-white font-bold text-sm"
