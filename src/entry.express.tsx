@@ -63,6 +63,9 @@ const io = new Server(httpServer);
 
 const emitCurrentTasks = async (projectId: string) => {
   const all_tasks = await prisma.task.findMany({
+    where: {
+      projectId: projectId,
+    },
     include: {
       userWhoCompletedTask: true,
     },
