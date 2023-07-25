@@ -85,7 +85,7 @@ export default component$(() => {
   const tasks = useSignal<TasksWithUserWhoCompletedTask[]>([]);
   const { socket } = useContext(SocketContext);
   const loc = useLocation();
-  // this task will be executed only once
+  // this task will be executed only when the tasksData changes
   useTask$(({ track }) => {
     track(() => tasksData.value.tasks);
     tasks.value = tasksData.value.tasks;
