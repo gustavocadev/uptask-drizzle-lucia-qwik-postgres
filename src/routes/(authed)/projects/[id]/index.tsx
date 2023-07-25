@@ -86,7 +86,8 @@ export default component$(() => {
   const { socket } = useContext(SocketContext);
   const loc = useLocation();
   // this task will be executed only once
-  useTask$(() => {
+  useTask$(({ track }) => {
+    track(() => tasksData.value.tasks);
     tasks.value = tasksData.value.tasks;
   });
 
