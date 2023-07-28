@@ -57,66 +57,61 @@ export type TasksWithUserWhoCompletedTask = Prisma.TaskGetPayload<{
   };
 }>;
 
-export const useTasks = routeLoader$<{
-  tasks: TasksWithUserWhoCompletedTask[];
-}>(async ({ params }) => {
-  // all the tasks that belong to the project with the user who completed the task
-  const tasks = await prisma.task.findMany({
-    where: {
-      projectId: params.id,
-    },
-    include: {
-      userWhoCompletedTask: true,
-    },
-  });
-
-  return {
-    tasks: tasks,
-  };
-});
-
 export default component$(() => {
   const loaderProject = useLoaderProject();
   const loaderContributors = useLoaderContributors();
   const loaderUserAuth = useLoaderUserAuth();
-  const tasksData = useTasks();
-
-  // const { tasks } = useContext(TaskContext);
   const tasks = useSignal<TasksWithUserWhoCompletedTask[]>([]);
-  const { socket } = useContext(SocketContext);
+  // const { tasks } = useContext(TaskContext);
+  const { socket, isOnline } = useContext(SocketContext);
   const loc = useLocation();
-  // this task will be executed only when the tasksData changes
+
   useTask$(({ track }) => {
-    track(() => tasksData.value.tasks);
-    tasks.value = tasksData.value.tasks;
+    track(() => [isOnline.value]);
+    socket.value?.on('connect', () => {
+      isOnline.value = socket.value?.connected;
+    });
+  });
+
+  useTask$(({ track }) => {
+    track(() => socket.value);
+    if (!socket.value) return;
+    //socket options
+    // socket.value.io.opts.extraHeaders = {
+    //   projectId: loc.params.id,
+    // };
+    socket.value.io.opts.query = {
+      projectId: loc.params.id,
+    };
+    // this is important to reflect the changes in the server
+    socket.value.disconnect().connect();
   });
 
   // yo join the room that means that you will receive the messages from that room
   useTask$(({ track }) => {
     // we need to track the socket because it will change !important
-    track(() => socket.value);
+    track(() => [socket.value]);
     if (!socket.value) return;
+
     socket.value.emit('open-project', loc.params.id);
   });
 
   // this task will be executed every time the socket changes
   useTask$(({ track }) => {
-    track(() => socket.value);
+    track(() => [socket.value]);
     if (!socket.value) return;
-
     // only execute every time the socket changes
-    socket.value.on(
-      'current-tasks',
-      (payload: TasksWithUserWhoCompletedTask[]) => {
-        tasks.value = payload;
-      }
-    );
+    socket.value.on('get-tasks', (payload: TasksWithUserWhoCompletedTask[]) => {
+      tasks.value = payload;
+    });
   });
+
   return (
     <>
       <div class="flex justify-between">
         <h1 class="font-black text-4xl">
-          {loaderProject.value.project?.name ?? ''}
+          {loaderProject.value.project?.name ?? ''} -{' '}
+          {isOnline.value ? 'Online' : 'Offline'}
         </h1>
 
         {loaderUserAuth.value.user?.userId ===

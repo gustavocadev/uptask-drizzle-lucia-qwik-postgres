@@ -31,16 +31,14 @@ export const useUserDataLoader = routeLoader$(async (event) => {
 
 export default component$(() => {
   return (
-    <>
-      <section>
-        <Header />
-        <div class="md:flex md:min-h-screen">
-          <Sidebar />
-          <main class="flex-1 p-10">
-            <Slot />
-          </main>
-        </div>
-      </section>
-    </>
+    <section>
+      <Header />
+      <div class="md:flex md:min-h-screen">
+        <Sidebar />
+        <main class="flex-1 p-10">
+          <Slot />
+        </main>
+      </div>
+    </section>
   );
 });

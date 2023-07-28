@@ -11,13 +11,5 @@ export default defineConfig(() => {
         'Cache-Control': 'public, max-age=600',
       },
     },
-    server: {
-      proxy: {
-        '/socket.io': {
-          target: 'http://localhost:3000',
-          ws: true
-        }
-      }
-    }
   };
 });

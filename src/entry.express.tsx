@@ -18,11 +18,6 @@ import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 
-import { createServer } from 'node:http';
-import { Server } from 'socket.io';
-import { prisma } from './lib/prisma';
-import * as dateFns from 'date-fns';
-
 declare global {
   interface QwikCityPlatform extends PlatformNode {}
 }
@@ -53,107 +48,6 @@ const { router, notFound } = createQwikCity({
 // https://expressjs.com/
 const app = express();
 
-/* ---- SOCKET IO ----*/
-
-// You need to create the HTTP server from the Express app
-const httpServer = createServer(app);
-
-// And then attach the socket.io server to the HTTP server
-const io = new Server(httpServer);
-
-const emitCurrentTasks = async (projectId: string) => {
-  const all_tasks = await prisma.task.findMany({
-    where: {
-      projectId: projectId,
-    },
-    include: {
-      userWhoCompletedTask: true,
-    },
-  });
-  io.to(projectId).emit('current-tasks', all_tasks);
-};
-// Then you can use `io` to listen the `connection` event and get a socket
-// from a client
-io.on('connection', async (socket) => {
-  socket.on('open-project', (projectId: string) => {
-    // with the join method you can join a specific room, then we can use `to` for example to send a message to a specific room
-    console.log(projectId);
-    socket.join(projectId);
-  });
-
-  // CREATE TASK
-  socket.on('new-task', async (task) => {
-    const parseDateToUTC = dateFns.parse(
-      task.dueDate,
-      'yyyy-MM-dd',
-      new Date()
-    );
-
-    await prisma.task.create({
-      data: {
-        deliveryDate: parseDateToUTC,
-        description: task.description,
-        name: task.name,
-        priority: task.priority,
-        projectId: task.projectId,
-      },
-    });
-
-    await emitCurrentTasks(task.projectId);
-  });
-
-  // DELETE TASK
-  socket.on('delete-task', async (task) => {
-    console.log(task);
-    await prisma.task.delete({
-      where: {
-        id: task.id,
-      },
-    });
-
-    await emitCurrentTasks(task.projectId);
-  });
-
-  // UPDATE TASK
-  socket.on('update-task', async (task) => {
-    const parseDateToUTC = dateFns.parse(
-      task.dueDate,
-      'yyyy-MM-dd',
-      new Date()
-    );
-
-    await prisma.task.update({
-      where: {
-        id: task.taskId,
-      },
-      data: {
-        deliveryDate: parseDateToUTC,
-        description: task.description,
-        name: task.name,
-        priority: task.priority,
-      },
-    });
-
-    await emitCurrentTasks(task.projectId);
-  });
-
-  socket.on('update-task-state', async (payload) => {
-    const taskState = JSON.parse(payload.taskState);
-    await prisma.task.update({
-      where: {
-        id: payload.task.id,
-      },
-      data: {
-        state: taskState,
-        userWhoCompletedTaskId: payload.userId,
-      },
-    });
-
-    await emitCurrentTasks(payload.task.projectId);
-  });
-});
-/* ---- SOCKET IO ----*/
-
 // Enable gzip compression
 // app.use(compression());
 
@@ -169,7 +63,7 @@ app.use(router);
 app.use(notFound);
 
 // Start the express server
-httpServer.listen(PORT, () => {
+app.listen(PORT, () => {
   /* eslint-disable */
   console.log(`Server started: http://localhost:${PORT}/`);
 });

@@ -24,15 +24,15 @@ export default component$(() => {
   const handleSubmit = $(async (e: QwikSubmitEvent<HTMLFormElement>) => {
     const target = e.target as HTMLFormElement;
     const formData = new FormData(target);
-    const task = {
-      name: formData.get('name'),
-      description: formData.get('description'),
-      priority: formData.get('priority'),
-      dueDate: formData.get('dueDate'),
-      projectId: formData.get('projectId'),
+    const createTaskValues = {
+      name: formData.get('name') as string,
+      description: formData.get('description') as string,
+      priority: formData.get('priority') as string,
+      deliveryDate: formData.get('dueDate') as string,
+      projectId: formData.get('projectId') as string,
     };
 
-    socket.value?.emit('new-task', task);
+    socket.value?.emit('new-task', createTaskValues);
     await nav(`/projects/${loaderTask.value.projectId}`);
   });
 
