@@ -48,11 +48,12 @@ export const useSocket = (serverPath: string) => {
 
 export const SocketProvider = component$(() => {
   // my global state
-  const { socket } = useSocket('/');
+  const { socket, isOnline } = useSocket('/');
 
   // my providers
   useContextProvider(SocketContext, {
     socket,
+    isOnline,
   });
   return <Slot />;
 });
