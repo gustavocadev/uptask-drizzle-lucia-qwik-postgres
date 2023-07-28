@@ -70,7 +70,7 @@ const emitCurrentTasks = async (projectId: string) => {
       userWhoCompletedTask: true,
     },
   });
-  io.to(projectId).emit('current-tasks', all_tasks);
+  io.to(projectId).emit('get-tasks', all_tasks);
 };
 // Then you can use `io` to listen the `connection` event and get a socket
 // from a client
@@ -80,6 +80,12 @@ io.on('connection', async (socket) => {
     console.log(projectId);
     socket.join(projectId);
   });
+
+  const projectId = socket.handshake.query?.projectId as string;
+
+  if (projectId) {
+    emitCurrentTasks(projectId);
+  }
 
   // CREATE TASK
   socket.on('new-task', async (task) => {
@@ -104,7 +110,7 @@ io.on('connection', async (socket) => {
 
   // DELETE TASK
   socket.on('delete-task', async (task) => {
-    console.log(task);
+    // console.log(task);
     await prisma.task.delete({
       where: {
         id: task.id,
