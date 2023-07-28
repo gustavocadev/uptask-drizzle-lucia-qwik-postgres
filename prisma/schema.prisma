@@ -11,11 +11,11 @@ model Project {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   // relation many-one
-  author   AuthUser @relation(name: "Author", fields: [authorId], references: [id])
+  author   User   @relation(name: "Author", fields: [authorId], references: [id])
   authorId String
 
   // relation many-many in mongodb
-  contributors   AuthUser[] @relation(name: "Contributors", fields: [contributorIDs], references: [id])
+  contributors   User[]   @relation(name: "Contributors", fields: [contributorIDs], references: [id])
   contributorIDs String[]
 
   createdAt    DateTime @default(now()) @db.Date
@@ -43,7 +43,7 @@ model Task {
   updatedAt    DateTime @default(now()) @db.Date()
 
   // many-to-one relation
-  userWhoCompletedTask AuthUser? @relation(name: "UserWhoCompletedTask", fields: [userWhoCompletedTaskId], references: [id])
+  userWhoCompletedTask User? @relation(name: "UserWhoCompletedTask", fields: [userWhoCompletedTaskId], references: [id])
 
   // it needs to be nullable because it can be null
   userWhoCompletedTaskId String?
@@ -51,10 +51,10 @@ model Task {
   @@map("tasks")
 }
 
-model AuthUser {
-  id           String        @id @map("_id")
-  auth_session AuthSession[]
-  auth_key     AuthKey[]
+model User {
+  id           String    @id @map("_id")
+  auth_session Session[]
+  auth_key     Key[]
 
   // custom fields
   createdAt DateTime @default(now())
@@ -73,29 +73,23 @@ model AuthUser {
 
   // one to many
   completedTasks Task[] @relation(name: "UserWhoCompletedTask")
-
-  @@map("auth_user")
 }
 
-model AuthSession {
-  id             String   @id @map("_id")
+model Session {
+  id             String @id @map("_id")
   user_id        String
   active_expires BigInt
   idle_expires   BigInt
-  auth_user      AuthUser @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  user           User   @relation(references: [id], fields: [user_id], onDelete: Cascade)
 
   @@index([user_id])
-  @@map("auth_session")
 }
 
-model AuthKey {
-  id              String   @id @map("_id")
+model Key {
+  id              String  @id @map("_id")
   hashed_password String?
   user_id         String
-  primary_key     Boolean
-  expires         BigInt?
-  auth_user       AuthUser @relation(references: [id], fields: [user_id], onDelete: Cascade)
+  user            User    @relation(references: [id], fields: [user_id], onDelete: Cascade)
 
   @@index([user_id])
-  @@map("auth_key")
 }

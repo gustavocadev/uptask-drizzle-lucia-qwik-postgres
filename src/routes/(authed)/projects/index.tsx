@@ -6,8 +6,8 @@ import { auth } from '~/lib/lucia';
 
 export const useLoaderProjects = routeLoader$(async (event) => {
   const authRequest = auth.handleRequest(event);
-  const { user } = await authRequest.validateUser();
-  if (!user) return { error: 'Not logged in' };
+  const session = await authRequest.validate();
+  if (!session) throw event.redirect(303, '/');
 
   // console.log({ user });
 
@@ -16,11 +16,11 @@ export const useLoaderProjects = routeLoader$(async (event) => {
     where: {
       OR: [
         {
-          authorId: user.userId,
+          authorId: session.user.userId,
         },
         {
           contributorIDs: {
-            has: user.userId,
+            has: session.user.userId,
           },
         },
       ],
@@ -49,12 +49,18 @@ export const useLoaderProjects = routeLoader$(async (event) => {
 
 export const userLoaderUser = routeLoader$(async (event) => {
   const authRequest = auth.handleRequest(event);
-  const { user } = await authRequest.validateUser();
-  if (!user) {
+  const session = await authRequest.validate();
+  if (!session) {
     return {
       error: 'Not logged in',
     };
   }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session.user.userId,
+    },
+  });
 
   return {
     user,
@@ -73,7 +79,7 @@ export default component$(() => {
           <PreviewProject
             project={project}
             key={project.id}
-            authUserId={loaderUser.value.user?.userId ?? ''}
+            authUserId={loaderUser.value.user?.id ?? ''}
           />
         ))}
       </div>

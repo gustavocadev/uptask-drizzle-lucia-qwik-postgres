@@ -1,5 +1,5 @@
 import { component$ } from '@builder.io/qwik';
-import type { AuthUser } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { Form, globalAction$, z, zod$ } from '@builder.io/qwik-city';
 import { prisma } from '~/lib/prisma';
 
@@ -31,7 +31,7 @@ export const useActionRemoveContributor = globalAction$(
 );
 
 type Props = {
-  contributor: AuthUser;
+  contributor: User;
   projectId: string;
   authorId: string;
   userAuthId: string;

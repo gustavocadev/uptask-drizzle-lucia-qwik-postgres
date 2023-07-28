@@ -15,7 +15,10 @@ export const useAuthSigninAction = routeAction$(
     const authRequest = auth.handleRequest(event);
 
     const key = await auth.useKey('email', values.email, values.password);
-    const session = await auth.createSession(key.userId);
+    const session = await auth.createSession({
+      userId: key.userId,
+      attributes: {},
+    });
 
     authRequest.setSession(session);
 

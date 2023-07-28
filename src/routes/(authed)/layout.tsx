@@ -3,14 +3,20 @@ import { routeLoader$ } from '@builder.io/qwik-city';
 import { Header } from '~/components/ui/Header';
 import { Sidebar } from '~/components/ui/Sidebar';
 import { auth } from '~/lib/lucia';
+import { prisma } from '~/lib/prisma';
 
 export const useUserDataLoader = routeLoader$(async (event) => {
   const authRequest = auth.handleRequest(event);
-  const { user } = await authRequest.validateUser();
+  const session = await authRequest.validate();
 
-  if (!user) {
+  if (!session) {
     throw event.redirect(303, '/');
   }
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session.user.userId,
+    },
+  });
 
   return {
     user,

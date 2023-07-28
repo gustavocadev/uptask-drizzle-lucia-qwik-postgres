@@ -10,7 +10,7 @@ import { prisma } from '~/lib/prisma';
 
 export const useActionSearchUsers = routeAction$(
   async (values) => {
-    const user = await prisma.authUser.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         email: values.email,
       },
@@ -36,7 +36,7 @@ export const useActionSearchUsers = routeAction$(
 export const useActionAddContributor = routeAction$(
   async (values, request) => {
     console.log({ values });
-    const userToAdd = await prisma.authUser.findFirst({
+    const userToAdd = await prisma.user.findFirst({
       where: {
         id: values.userId,
       },

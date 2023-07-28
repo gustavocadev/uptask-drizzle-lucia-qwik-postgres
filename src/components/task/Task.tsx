@@ -54,7 +54,7 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
 
     const task = JSON.parse(taskStr);
 
-    const userId = userData.value.user.userId;
+    const userId = userData.value.user?.id;
     socket.value?.emit('update-task-state', { task, taskState, userId });
   });
 

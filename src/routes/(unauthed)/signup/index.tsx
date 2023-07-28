@@ -6,7 +6,7 @@ export const useSignupAction = routeAction$(
   async (values, event) => {
     // create the user in the database
     await auth.createUser({
-      primaryKey: {
+      key: {
         providerId: 'email',
         providerUserId: values.email,
         password: values.password,

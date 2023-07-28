@@ -37,18 +37,30 @@ export const useLoaderContributors = routeLoader$(async ({ params }) => {
   };
 });
 
-export const useLoaderUserAuth = routeLoader$(async ({ request, cookie }) => {
-  const authRequest = auth.handleRequest({
-    request: request,
-    cookie: cookie,
-  });
+export const useLoaderUserAuth = routeLoader$(
+  async ({ request, cookie, redirect }) => {
+    const authRequest = auth.handleRequest({
+      request: request,
+      cookie: cookie,
+    });
 
-  const { user } = await authRequest.validateUser();
+    const session = await authRequest.validate();
 
-  return {
-    user,
-  };
-});
+    if (!session) {
+      throw redirect(303, '/');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: session.user.userId,
+      },
+    });
+
+    return {
+      user,
+    };
+  }
+);
 
 // get merge types
 export type TasksWithUserWhoCompletedTask = Prisma.TaskGetPayload<{
@@ -103,7 +115,7 @@ export default component$(() => {
           {loaderProject.value.project?.name ?? ''}
         </h1>
 
-        {loaderUserAuth.value.user?.userId ===
+        {loaderUserAuth.value.user?.id ===
           loaderProject.value.project?.authorId && (
           <div class="flex items-center gap-2 text-gray-400 hover:text-black">
             <svg
@@ -130,7 +142,7 @@ export default component$(() => {
           </div>
         )}
       </div>
-      {loaderUserAuth.value.user?.userId ===
+      {loaderUserAuth.value.user?.id ===
         loaderProject.value.project?.authorId && (
         <Link
           href={`/projects/${loaderProject.value.project?.id}/task/new`}
@@ -163,7 +175,7 @@ export default component$(() => {
               key={task.id}
               task={task}
               authorId={loaderProject.value.project?.authorId ?? ''}
-              userAuthId={loaderUserAuth.value.user?.userId ?? ''}
+              userAuthId={loaderUserAuth.value.user?.id ?? ''}
             />
           ))
         ) : (
@@ -172,7 +184,7 @@ export default component$(() => {
       </div>
       <div class="flex items-center justify-between mt-10">
         <p class="font-bold text-xl">Colaboradores</p>
-        {loaderUserAuth.value.user?.userId ===
+        {loaderUserAuth.value.user?.id ===
           loaderProject.value.project?.authorId && (
           <Link
             class="uppercase font-bold text-gray-400 hover:text-black transition-colors "
@@ -191,7 +203,7 @@ export default component$(() => {
               key={contributor.id}
               projectId={loaderProject.value.project?.id ?? ''}
               authorId={loaderProject.value.project?.authorId ?? ''}
-              userAuthId={loaderUserAuth.value.user?.userId ?? ''}
+              userAuthId={loaderUserAuth.value.user?.id ?? ''}
             />
           ))
         ) : (

@@ -4,7 +4,7 @@ import { auth } from '~/lib/lucia';
 
 export const useSignoutAction = globalAction$(async (values, event) => {
   const authRequest = auth.handleRequest(event);
-  const { session } = await authRequest.validateUser();
+  const session = await authRequest.validate();
 
   if (!session) throw event.redirect(303, '/');
 

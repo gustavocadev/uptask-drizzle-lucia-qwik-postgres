@@ -41,14 +41,14 @@ export const useCreateProjectAction = routeAction$(
 
 export const useLoaderUserData = routeLoader$(async (event) => {
   const authRequest = auth.handleRequest(event);
-  const { user } = await authRequest.validateUser();
-  if (!user)
+  const session = await authRequest.validate();
+  if (!session)
     return {
       userId: null,
     };
 
   return {
-    userId: user.userId,
+    userId: session.user.userId,
   };
 });
 
