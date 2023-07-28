@@ -57,38 +57,35 @@ export type TasksWithUserWhoCompletedTask = Prisma.TaskGetPayload<{
   };
 }>;
 
-export const useTasks = routeLoader$<{
-  tasks: TasksWithUserWhoCompletedTask[];
-}>(async ({ params }) => {
-  // all the tasks that belong to the project with the user who completed the task
-  const tasks = await prisma.task.findMany({
-    where: {
-      projectId: params.id,
-    },
-    include: {
-      userWhoCompletedTask: true,
-    },
-  });
-
-  return {
-    tasks: tasks,
-  };
-});
-
 export default component$(() => {
   const loaderProject = useLoaderProject();
   const loaderContributors = useLoaderContributors();
   const loaderUserAuth = useLoaderUserAuth();
-  const tasksData = useTasks();
 
   // const { tasks } = useContext(TaskContext);
   const tasks = useSignal<TasksWithUserWhoCompletedTask[]>([]);
   const { socket } = useContext(SocketContext);
   const loc = useLocation();
-  // this task will be executed only when the tasksData changes
+
+  // this task will be executed only when the socket changes to set query params
   useTask$(({ track }) => {
-    track(() => tasksData.value.tasks);
-    tasks.value = tasksData.value.tasks;
+    track(() => socket.value);
+    if (!socket.value) return;
+
+    socket.value.io.opts.query = {
+      projectId: loc.params.id,
+    };
+
+    socket.value.disconnect().connect();
+  });
+
+  // this task will be executed only when the socket changes
+  useTask$(({ track }) => {
+    track(() => socket.value);
+
+    socket.value?.on('get-tasks', (payload) => {
+      tasks.value = payload;
+    });
   });
 
   // yo join the room that means that you will receive the messages from that room
@@ -99,19 +96,6 @@ export default component$(() => {
     socket.value.emit('open-project', loc.params.id);
   });
 
-  // this task will be executed every time the socket changes
-  useTask$(({ track }) => {
-    track(() => socket.value);
-    if (!socket.value) return;
-
-    // only execute every time the socket changes
-    socket.value.on(
-      'current-tasks',
-      (payload: TasksWithUserWhoCompletedTask[]) => {
-        tasks.value = payload;
-      }
-    );
-  });
   return (
     <>
       <div class="flex justify-between">
