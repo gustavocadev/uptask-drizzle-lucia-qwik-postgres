@@ -6,8 +6,7 @@
 
 # Development
 node_modules
-
-pnpm-lock.yaml
+*.local
 
 # Cache
 .cache
@@ -26,7 +25,9 @@ lerna-debug.log*
 
 # Editor
 .vscode/*
-!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/*.code-snippets
+
 .idea
 .DS_Store
 *.suo
@@ -39,8 +40,8 @@ lerna-debug.log*
 .yarn/*
 !.yarn/releases
 
-# Environment
-.env
 
-# Vercel
-.vercel
+.nx/cache
+
+# Cloudflare
+functions/**/*.js
