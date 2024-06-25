@@ -1,10 +1,10 @@
 import { component$, Slot } from '@builder.io/qwik';
 import { routeLoader$ } from '@builder.io/qwik-city';
-import { auth } from '~/lib/lucia';
+import { handleRequest } from '~/server/db/lucia';
 
 export const useLoaderData = routeLoader$(async (event) => {
-  const authRequest = auth.handleRequest(event);
-  const session = await authRequest.validate();
+  const authRequest = handleRequest(event);
+  const { session } = await authRequest.validateUser();
 
   console.log(
     'If there is a session redirect to /projects if not redirect to /'
