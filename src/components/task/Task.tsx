@@ -1,6 +1,5 @@
 import {
   $,
-  type QwikSubmitEvent,
   component$,
   useContext,
   useSignal,
@@ -10,10 +9,10 @@ import { Link } from '@builder.io/qwik-city';
 import * as dateFns from 'date-fns';
 import { SocketContext } from '~/context/socket/SocketContext';
 import { useUserDataLoader } from '~/routes/(authed)/layout';
-import type { TasksWithUserWhoCompletedTask } from '~/routes/(authed)/projects/[id]';
+import type { Task as ITask } from '~/server/services/task/entities/task';
 
 export interface TaskProps {
-  task: TasksWithUserWhoCompletedTask;
+  task: ITask;
   authorId: string;
   userAuthId: string;
 }
@@ -34,7 +33,7 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
     );
   });
 
-  const handleSubmit = $((e: QwikSubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = $((e: SubmitEvent) => {
     const target = e.target as HTMLFormElement;
     const formData = new FormData(target);
 
@@ -45,7 +44,7 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
     socket.value?.emit('delete-task', task);
   });
 
-  const handleChangeState = $((e: QwikSubmitEvent<HTMLFormElement>) => {
+  const handleChangeState = $((e: SubmitEvent) => {
     const target = e.target as HTMLFormElement;
     const formData = new FormData(target);
 
@@ -54,7 +53,7 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
 
     const task = JSON.parse(taskStr);
 
-    const userId = userData.value.user?.id;
+    const userId = userData.value.user.id;
     socket.value?.emit('update-task-state', { task, taskState, userId });
   });
 
@@ -67,7 +66,7 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
         <p class="mb-1 text-gray-600">Priority: {task.priority}</p>
         {task.state && (
           <p class="text-xs bg-green-600 uppercase p-1 rounded-lg text-white">
-            Completada por: {task.userWhoCompletedTask?.name}
+            {/* Completada por: {task.userWhoCompletedTaskId?.name} */}
           </p>
         )}
       </div>

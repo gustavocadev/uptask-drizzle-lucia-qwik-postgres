@@ -1,6 +1,6 @@
 import { component$ } from '@builder.io/qwik';
 import { Link } from '@builder.io/qwik-city';
-import type { Project } from '@prisma/client';
+import type { Project } from '~/server/services/project/entities/project';
 
 export interface PreviewProjectProps {
   project: Project;
@@ -16,11 +16,11 @@ export const PreviewProject = component$<PreviewProjectProps>(
             {project.name}
 
             <span class="text-sm text-gray-500 uppercase">
-              {''} {project.customer}
+              {''} {project.customerName}
             </span>
           </p>
 
-          {project.authorId !== authUserId && (
+          {project.userId !== authUserId && (
             <p class="p-1 text-xs rounded-lg text-white bg-green-500 font-bold uppercase">
               Colaborador
             </p>

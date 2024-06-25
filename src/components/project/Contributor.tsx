@@ -1,24 +1,12 @@
 import { component$ } from '@builder.io/qwik';
-import type { User } from '@prisma/client';
 import { Form, globalAction$, z, zod$ } from '@builder.io/qwik-city';
-import { prisma } from '~/lib/prisma';
+import { removeOneContributor } from '~/server/services/contributor/contributor';
+import type { UserContributor } from '~/server/services/contributor/types/UserContributor';
 
 export const useActionRemoveContributor = globalAction$(
   async (values) => {
     // delete one contributor from the project contributors
-    await prisma.project.update({
-      where: {
-        id: values.projectId,
-      },
-      data: {
-        contributors: {
-          // we use the disconnect method to delete the contributor only from the model of the project
-          disconnect: {
-            id: values.contributorId,
-          },
-        },
-      },
-    });
+    await removeOneContributor(values.projectId, values.contributorId);
 
     return {
       success: true,
@@ -31,7 +19,7 @@ export const useActionRemoveContributor = globalAction$(
 );
 
 type Props = {
-  contributor: User;
+  contributor: UserContributor;
   projectId: string;
   authorId: string;
   userAuthId: string;
