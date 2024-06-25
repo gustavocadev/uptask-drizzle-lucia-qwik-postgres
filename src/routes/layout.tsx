@@ -29,11 +29,7 @@ export const onRequest: RequestHandler = async ({ cookie, sharedMap }) => {
 //   return (
 //     <SocketProvider>
 //       <TaskProvider>
-//         <main class="container mx-auto mt-5 md:mt-20 p-5 md:flex md:justify-center ">
-//           <section class="md:w-2/3 lg:w-2/5">
-//             <Slot />
-//           </section>
-//         </main>
+//         <Slot />
 //       </TaskProvider>
 //     </SocketProvider>
 //   );
