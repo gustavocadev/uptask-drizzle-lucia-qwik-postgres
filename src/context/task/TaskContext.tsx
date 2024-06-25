@@ -1,5 +1,5 @@
 import { type Signal, createContextId } from '@builder.io/qwik';
-import type { Task } from '@prisma/client';
+import type { Task } from '~/server/services/task/entities/task';
 
 type TaskContextType = {
   tasks: Signal<Task[]>;

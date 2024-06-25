@@ -1,20 +1,17 @@
 import { component$, useContext, useSignal, useTask$ } from '@builder.io/qwik';
 import { Link, routeLoader$, useLocation } from '@builder.io/qwik-city';
-import type { Prisma } from '@prisma/client';
 import Contributor from '~/components/project/Contributor';
 import { Task } from '~/components/task/Task';
 import { SocketContext } from '~/context/socket/SocketContext';
-import { auth } from '~/lib/lucia';
-import { prisma } from '~/lib/prisma';
-// import type { Task as ITask } from '@prisma/client';
+import { handleRequest } from '~/server/db/lucia';
+import { findContributorsByProjectId } from '~/server/services/contributor/contributor';
+import { findOneProject } from '~/server/services/project/project';
+import type { Task as ITask } from '~/server/services/task/entities/task';
+import { findOneUser } from '~/server/services/user/user';
 
 export const useLoaderProject = routeLoader$(async ({ params }) => {
   // the project data
-  const project = await prisma.project.findUnique({
-    where: {
-      id: params.id,
-    },
-  });
+  const project = await findOneProject(params.id);
 
   return {
     project,
@@ -23,51 +20,28 @@ export const useLoaderProject = routeLoader$(async ({ params }) => {
 
 export const useLoaderContributors = routeLoader$(async ({ params }) => {
   // all the contributors that belong to the project
-  const contributors = await prisma.project.findMany({
-    where: {
-      id: params.id,
-    },
-    select: {
-      contributors: true,
-    },
-  });
+  const contributors = await findContributorsByProjectId(params.id);
 
   return {
-    contributors: contributors[0].contributors,
+    contributors: contributors,
   };
 });
 
-export const useLoaderUserAuth = routeLoader$(
-  async ({ request, cookie, redirect }) => {
-    const authRequest = auth.handleRequest({
-      request: request,
-      cookie: cookie,
-    });
+export const useLoaderUserAuth = routeLoader$(async ({ cookie, redirect }) => {
+  const authRequest = handleRequest({ cookie });
 
-    const session = await authRequest.validate();
+  const { session } = await authRequest.validateUser();
 
-    if (!session) {
-      throw redirect(303, '/');
-    }
-
-    const user = await prisma.user.findUnique({
-      where: {
-        id: session.user.userId,
-      },
-    });
-
-    return {
-      user,
-    };
+  if (!session) {
+    throw redirect(303, '/');
   }
-);
 
-// get merge types
-export type TasksWithUserWhoCompletedTask = Prisma.TaskGetPayload<{
-  include: {
-    userWhoCompletedTask: true;
+  const user = await findOneUser(session.userId);
+
+  return {
+    user,
   };
-}>;
+});
 
 export default component$(() => {
   const loaderProject = useLoaderProject();
@@ -75,7 +49,7 @@ export default component$(() => {
   const loaderUserAuth = useLoaderUserAuth();
 
   // const { tasks } = useContext(TaskContext);
-  const tasks = useSignal<TasksWithUserWhoCompletedTask[]>([]);
+  const tasks = useSignal<ITask[]>([]);
   const { socket } = useContext(SocketContext);
   const loc = useLocation();
 
@@ -116,19 +90,19 @@ export default component$(() => {
         </h1>
 
         {loaderUserAuth.value.user?.id ===
-          loaderProject.value.project?.authorId && (
+          loaderProject.value.project?.userId && (
           <div class="flex items-center gap-2 text-gray-400 hover:text-black">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              strokeWidth={1.5}
+              stroke-width={1.5}
               stroke="currentColor"
               class="w-6 h-6"
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                stroke-linecap="round"
+                stroke-linejoin="round"
                 d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
               />
             </svg>
@@ -143,7 +117,7 @@ export default component$(() => {
         )}
       </div>
       {loaderUserAuth.value.user?.id ===
-        loaderProject.value.project?.authorId && (
+        loaderProject.value.project?.userId && (
         <Link
           href={`/projects/${loaderProject.value.project?.id}/task/new`}
           // onClick={projectStore.toggleModalFormTask}
@@ -153,13 +127,13 @@ export default component$(() => {
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            strokeWidth={1.5}
+            stroke-width={1.5}
             stroke="currentColor"
             class="w-6 h-6"
           >
             <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              stroke-linecap="round"
+              stroke-linejoin="round"
               d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
@@ -174,7 +148,7 @@ export default component$(() => {
             <Task
               key={task.id}
               task={task}
-              authorId={loaderProject.value.project?.authorId ?? ''}
+              authorId={loaderProject.value.project?.userId ?? ''}
               userAuthId={loaderUserAuth.value.user?.id ?? ''}
             />
           ))
@@ -185,7 +159,7 @@ export default component$(() => {
       <div class="flex items-center justify-between mt-10">
         <p class="font-bold text-xl">Colaboradores</p>
         {loaderUserAuth.value.user?.id ===
-          loaderProject.value.project?.authorId && (
+          loaderProject.value.project?.userId && (
           <Link
             class="uppercase font-bold text-gray-400 hover:text-black transition-colors "
             href={`/projects/${loaderProject.value.project?.id}/new-contributor`}
@@ -202,7 +176,7 @@ export default component$(() => {
               contributor={contributor}
               key={contributor.id}
               projectId={loaderProject.value.project?.id ?? ''}
-              authorId={loaderProject.value.project?.authorId ?? ''}
+              authorId={loaderProject.value.project?.userId ?? ''}
               userAuthId={loaderUserAuth.value.user?.id ?? ''}
             />
           ))
