@@ -19,7 +19,7 @@ export const Header = component$(() => {
     <header class="px-4 py-5 bg-white border-b">
       <nav class="md:flex md:justify-between">
         <h2 class="text-4xl text-sky-600 font-black text-center mb-5 md:mb-0">
-          <Link href="/projects">Uptasks</Link>
+          <Link href="/projects">Mitask</Link>
         </h2>
 
         <div class="flex flex-col md:flex-row items-center gap-4">
