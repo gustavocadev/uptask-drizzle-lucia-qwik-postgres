@@ -1,4 +1,4 @@
-# Qwik City App ⚡️ + Socket.io + Lucia Auth + Prisma with MongoDB
+# Qwik City App ⚡️ + Socket.io + Lucia Auth + Drizzle ORM with PostgreSQL
 
 \### Project status
 
@@ -14,7 +14,7 @@
 This app has a minimal [Express server](https://expressjs.com/) implementation. After running a full build, you can preview the build using the command:
 
 ```
-pnpm serve
+bun run serve
 ```
 
 Then visit [http://localhost:8080/](http://localhost:8080/)
