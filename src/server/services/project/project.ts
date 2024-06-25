@@ -1,9 +1,10 @@
 import { eq, or } from 'drizzle-orm';
 import { db } from '~/server/db/db';
-import { contributor, project, userTable } from '~/server/db/schema';
-import type { ProjectByUser } from './types/project';
+import { contributor, project } from '~/server/db/schema';
+import type { CreateProjectDto } from './dto/project';
+import { Project } from './entities/project';
 
-export const findOneProject = async (projectId: string) => {
+export const findOneProject = async (projectId: string): Promise<Project> => {
   const [projectFound] = await db
     .select()
     .from(project)
@@ -13,32 +14,23 @@ export const findOneProject = async (projectId: string) => {
 
 export const findProjectsByUserId = async (
   userId: string
-): Promise<ProjectByUser[]> => {
+): Promise<Project[]> => {
   const projectsByUser = await db
     .select({
       id: project.id,
       name: project.name,
       description: project.description,
-      customer: project.customerName,
-      authorId: project.userId,
-
+      customerName: project.customerName,
+      userId: project.userId,
       createdAt: project.createdAt,
       updatedAt: project.updatedAt,
+      deliveryDate: project.deliveryDate,
     })
     .from(project)
-    .innerJoin(userTable, eq(userTable.id, project.userId))
     .leftJoin(contributor, eq(contributor.projectId, project.id))
     .where(or(eq(project.userId, userId), eq(contributor.userId, userId)));
 
   return projectsByUser;
-};
-
-type CreateProjectDto = {
-  name: string;
-  userId: string;
-  customerName: string;
-  deliveryDate: Date;
-  description: string;
 };
 
 export const createProject = async ({
@@ -47,15 +39,7 @@ export const createProject = async ({
   deliveryDate,
   description,
   name,
-}: CreateProjectDto) => {
-  console.log({
-    userId,
-    customerName,
-    deliveryDate,
-    description,
-    name,
-  });
-
+}: CreateProjectDto): Promise<void> => {
   await db.insert(project).values({
     name,
     description,

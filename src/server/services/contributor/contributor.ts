@@ -1,8 +1,11 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db } from '~/server/db/db';
 import { contributor, project, userTable } from '~/server/db/schema';
+import { UserContributor } from './types/UserContributor';
 
-export const findContributorsByProjectId = async (projectId: string) => {
+export const findContributorsByProjectId = async (
+  projectId: string
+): Promise<UserContributor[]> => {
   const contributors = await db
     .select({
       id: userTable.id,
@@ -17,9 +20,26 @@ export const findContributorsByProjectId = async (projectId: string) => {
   return contributors;
 };
 
-export const createContributor = async (userId: string, projectId: string) => {
+export const createContributor = async (
+  userId: string,
+  projectId: string
+): Promise<void> => {
   await db.insert(contributor).values({
     userId,
     projectId,
   });
+};
+
+export const removeOneContributor = async (
+  projectId: string,
+  contributorId: string
+): Promise<void> => {
+  await db
+    .delete(contributor)
+    .where(
+      and(
+        eq(contributor.projectId, projectId),
+        eq(contributor.id, contributorId)
+      )
+    );
 };

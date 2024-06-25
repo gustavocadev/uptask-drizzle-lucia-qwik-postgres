@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm';
 import { db } from '~/server/db/db';
 import { userTable } from '~/server/db/schema';
+import { User } from './entities/user';
 
-export const findOneUser = async (userId: string) => {
+export const findOneUser = async (userId: string): Promise<User> => {
   const [user] = await db
     .select()
     .from(userTable)
@@ -10,7 +11,7 @@ export const findOneUser = async (userId: string) => {
   return user;
 };
 
-export const findOneUserByEmail = async (userEmail: string) => {
+export const findOneUserByEmail = async (userEmail: string): Promise<User> => {
   const [user] = await db
     .select()
     .from(userTable)
