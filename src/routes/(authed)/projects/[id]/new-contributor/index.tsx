@@ -6,15 +6,13 @@ import {
   zod$,
   routeAction$,
 } from '@builder.io/qwik-city';
-import { prisma } from '~/lib/prisma';
+import { createContributor } from '~/server/services/contributor/contributor';
+import { findOneProject } from '~/server/services/project/project';
+import { findOneUser, findOneUserByEmail } from '~/server/services/user/user';
 
 export const useActionSearchUsers = routeAction$(
   async (values) => {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: values.email,
-      },
-    });
+    const user = await findOneUserByEmail(values.email);
 
     console.log({ user });
 
@@ -36,11 +34,7 @@ export const useActionSearchUsers = routeAction$(
 export const useActionAddContributor = routeAction$(
   async (values, request) => {
     console.log({ values });
-    const userToAdd = await prisma.user.findFirst({
-      where: {
-        id: values.userId,
-      },
-    });
+    const userToAdd = await findOneUser(values.userId);
 
     if (!userToAdd) {
       return {
@@ -48,19 +42,21 @@ export const useActionAddContributor = routeAction$(
       };
     }
 
-    await prisma.project.update({
-      where: {
-        id: values.projectId,
-      },
-      data: {
-        contributors: {
-          // connect means that we are adding a user to the project
-          connect: {
-            id: userToAdd.id,
-          },
-        },
-      },
-    });
+    // await prisma.project.update({
+    //   where: {
+    //     id: values.projectId,
+    //   },
+    //   data: {
+    //     contributors: {
+    //       // connect means that we are adding a user to the project
+    //       connect: {
+    //         id: userToAdd.id,
+    //       },
+    //     },
+    //   },
+    // });
+
+    await createContributor(values.userId, values.projectId);
 
     console.log({ userToAdd });
     throw request.redirect(303, `/projects/${values.projectId}`);
@@ -73,11 +69,7 @@ export const useActionAddContributor = routeAction$(
 
 export const useLoaderProject = routeLoader$(async ({ params }) => {
   // the project data
-  const project = await prisma.project.findUnique({
-    where: {
-      id: params.id,
-    },
-  });
+  const project = await findOneProject(params.id);
 
   return {
     project,

@@ -6,9 +6,9 @@ import {
   Form,
   routeLoader$,
 } from '@builder.io/qwik-city';
-import { prisma } from '~/lib/prisma';
 import * as dateFns from 'date-fns';
-import { auth } from '~/lib/lucia';
+import { handleRequest } from '~/server/db/lucia';
+import { createProject } from '~/server/services/project/project';
 
 export const useCreateProjectAction = routeAction$(
   async (values, event) => {
@@ -18,14 +18,13 @@ export const useCreateProjectAction = routeAction$(
       'yyyy-MM-dd',
       new Date()
     );
-    await prisma.project.create({
-      data: {
-        name: values.name,
-        description: values.description,
-        deliveryDate: deliveryDateUTC,
-        customer: values.customer,
-        authorId: values.userId,
-      },
+
+    await createProject({
+      customerName: values.customerName,
+      deliveryDate: deliveryDateUTC,
+      description: values.description,
+      name: values.name,
+      userId: values.userId,
     });
 
     throw event.redirect(303, '/projects');
@@ -34,21 +33,21 @@ export const useCreateProjectAction = routeAction$(
     name: z.string().min(1).max(100),
     description: z.string().min(1).max(1000),
     dueDate: z.string().min(1).max(100),
-    customer: z.string().min(1).max(100),
+    customerName: z.string().min(1).max(100),
     userId: z.string(),
   })
 );
 
 export const useLoaderUserData = routeLoader$(async (event) => {
-  const authRequest = auth.handleRequest(event);
-  const session = await authRequest.validate();
+  const authRequest = handleRequest(event);
+  const { session } = await authRequest.validateUser();
   if (!session)
     return {
       userId: null,
     };
 
   return {
-    userId: session.user.userId,
+    userId: session.userId,
   };
 });
 
@@ -88,7 +87,7 @@ export default component$(() => {
               class="text-gray-700 upper
         text-sm font-bold"
             >
-              Nombre del proyecto
+              Descripcion del proyecto
             </label>
             <textarea
               id="description"
@@ -116,7 +115,7 @@ export default component$(() => {
 
           <div class="mb-5">
             <label
-              for="customer"
+              for="customerName"
               class="text-gray-700 upper
         text-sm font-bold"
             >
@@ -124,10 +123,10 @@ export default component$(() => {
             </label>
             <input
               type="text"
-              id="customer"
+              id="customerName"
               class="border-2 w-full p-2 mt-2 placeholder-gray-400 rounded-md"
               placeholder="Nombre del pryecto"
-              name="customer"
+              name="customerName"
             />
           </div>
 

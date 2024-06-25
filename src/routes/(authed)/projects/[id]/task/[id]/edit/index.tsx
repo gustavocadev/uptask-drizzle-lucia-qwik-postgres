@@ -1,20 +1,11 @@
-import {
-  $,
-  type QwikSubmitEvent,
-  component$,
-  useContext,
-} from '@builder.io/qwik';
+import { $, component$, useContext } from '@builder.io/qwik';
 import { routeLoader$, useNavigate } from '@builder.io/qwik-city';
-import { prisma } from '~/lib/prisma';
 import * as dateFns from 'date-fns';
 import { SocketContext } from '~/context/socket/SocketContext';
+import { findOneTask } from '~/server/services/task/task';
 
 export const useLoaderTask = routeLoader$(async ({ params }) => {
-  const task = await prisma.task.findUnique({
-    where: {
-      id: params.id,
-    },
-  });
+  const task = await findOneTask(params.id);
 
   if (!task) {
     throw new Error('Task not found');
@@ -40,7 +31,7 @@ export default component$(() => {
   const { socket } = useContext(SocketContext);
   const nav = useNavigate();
 
-  const handleUpdateTask = $(async (e: QwikSubmitEvent<HTMLFormElement>) => {
+  const handleUpdateTask = $(async (e: SubmitEvent) => {
     const target = e.target as HTMLFormElement;
     const formData = new FormData(target);
 
