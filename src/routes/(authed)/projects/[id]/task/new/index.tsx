@@ -11,7 +11,6 @@ export const useLoaderTask = routeLoader$(({ params }) => {
 const priorities = ['low', 'medium', 'high'];
 
 export default component$(() => {
-  // const actionNewTask = useActionNewTask();
   const loaderTask = useLoaderTask();
   const { socket } = useContext(SocketContext);
   const nav = useNavigate();
@@ -27,7 +26,12 @@ export default component$(() => {
       projectId: formData.get('projectId'),
     };
 
-    socket.value?.emit('new-task', task);
+    socket.value?.send(
+      JSON.stringify({
+        type: 'new-task',
+        payload: task,
+      })
+    );
     await nav(`/projects/${loaderTask.value.projectId}`);
   });
 

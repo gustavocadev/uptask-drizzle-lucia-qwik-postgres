@@ -1,7 +1,6 @@
 import { component$, Slot } from '@builder.io/qwik';
 import type { RequestHandler } from '@builder.io/qwik-city';
-// import { SocketProvider } from '~/context/socket/SocketProvider';
-// import { TaskProvider } from '~/context/task/TaskProvider';
+import { SocketProvider } from '~/context/socket/SocketProvider';
 import { handleRequest } from '~/server/db/lucia';
 
 export const onGet: RequestHandler = async ({ cacheControl }) => {
@@ -24,17 +23,10 @@ export const onRequest: RequestHandler = async ({ cookie, sharedMap }) => {
   sharedMap.set('session', session);
 };
 
-// !important: fix this
-// export default component$(() => {
-//   return (
-//     <SocketProvider>
-//       <TaskProvider>
-//         <Slot />
-//       </TaskProvider>
-//     </SocketProvider>
-//   );
-// });
-
 export default component$(() => {
-  return <Slot />;
+  return (
+    <SocketProvider>
+      <Slot />
+    </SocketProvider>
+  );
 });

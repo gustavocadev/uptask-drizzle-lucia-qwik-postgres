@@ -1,5 +1,5 @@
 import { component$, useContext, useSignal, useTask$ } from '@builder.io/qwik';
-import { Link, routeLoader$, useLocation } from '@builder.io/qwik-city';
+import { Link, routeLoader$ } from '@builder.io/qwik-city';
 import Contributor from '~/components/project/Contributor';
 import { Task } from '~/components/task/Task';
 import { SocketContext } from '~/context/socket/SocketContext';
@@ -48,45 +48,28 @@ export default component$(() => {
   const loaderContributors = useLoaderContributors();
   const loaderUserAuth = useLoaderUserAuth();
 
-  // const { tasks } = useContext(TaskContext);
   const tasks = useSignal<ITask[]>([]);
-  const { socket } = useContext(SocketContext);
-  const loc = useLocation();
-
-  // this task will be executed only when the socket changes to set query params
-  useTask$(({ track }) => {
-    track(() => socket.value);
-    if (!socket.value) return;
-
-    socket.value.io.opts.query = {
-      projectId: loc.params.id,
-    };
-
-    socket.value.disconnect().connect();
-  });
+  const { socket, isOnline } = useContext(SocketContext);
 
   // this task will be executed only when the socket changes
   useTask$(({ track }) => {
     track(() => socket.value);
-
-    socket.value?.on('get-tasks', (payload) => {
-      tasks.value = payload;
-    });
-  });
-
-  // yo join the room that means that you will receive the messages from that room
-  useTask$(({ track }) => {
-    // we need to track the socket because it will change !important
-    track(() => socket.value);
     if (!socket.value) return;
-    socket.value.emit('open-project', loc.params.id);
+
+    socket.value.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'get-tasks') {
+        tasks.value = data.payload;
+      }
+    };
   });
 
   return (
     <>
       <div class="flex justify-between">
         <h1 class="font-black text-4xl">
-          {loaderProject.value.project?.name ?? ''}
+          {loaderProject.value.project?.name ?? ''} -{' '}
+          {isOnline.value ? 'Online' : 'Offline'}
         </h1>
 
         {loaderUserAuth.value.user?.id ===

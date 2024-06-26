@@ -36,9 +36,17 @@ export default component$(() => {
     const formData = new FormData(target);
 
     const task = Object.fromEntries(formData.entries());
-    // console.log({ task });
 
-    socket.value?.emit('update-task', task);
+    socket.value?.send(
+      JSON.stringify({
+        type: 'update-task',
+        payload: {
+          taskId: loaderTask.value.task?.id,
+          newTask: task,
+        },
+      })
+    );
+
     await nav('/projects/' + loaderTask.value.task?.projectId);
   });
 
@@ -129,16 +137,6 @@ export default component$(() => {
               />
             </div>
 
-            <input
-              type="hidden"
-              name="taskId"
-              value={loaderTask.value.task?.id}
-            />
-            <input
-              type="hidden"
-              name="projectId"
-              value={loaderTask.value.task?.projectId}
-            />
             <button
               type="submit"
               class="bg-sky-600 hover:bg-sky-700 p-3 text-white uppercase font-bold transition-colors rounded text-sm w-full"
