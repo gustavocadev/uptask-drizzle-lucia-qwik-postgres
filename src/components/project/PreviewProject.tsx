@@ -1,5 +1,4 @@
 import { component$ } from '@builder.io/qwik';
-import { Link } from '@builder.io/qwik-city';
 import type { Project } from '~/server/services/project/entities/project';
 
 export interface PreviewProjectProps {
@@ -27,12 +26,12 @@ export const PreviewProject = component$<PreviewProjectProps>(
           )}
         </div>
 
-        <Link
+        <a
           href={`/projects/${project.id}`}
           class="text-gray-600 hover:text-gray-800 uppercase text-sm font-bold"
         >
           Ver Proyecto
-        </Link>
+        </a>
       </div>
     );
   }
