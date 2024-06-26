@@ -9,12 +9,12 @@
 - [x] Delete colaborators
 - [x] Add Socket.io
 
-## Express Server
+## Bun Server
 
-This app has a minimal [Express server](https://expressjs.com/) implementation. After running a full build, you can preview the build using the command:
+This app has a minimal [Bun server](https://bun.sh/docs/api/http) implementation. After running a full build, you can preview the build using the command:
 
 ```
 bun run serve
 ```
 
-Then visit [http://localhost:8080/](http://localhost:8080/)
+Then visit [http://localhost:3000/](http://localhost:3000/)
