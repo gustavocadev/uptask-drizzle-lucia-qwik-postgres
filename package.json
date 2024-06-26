@@ -60,8 +60,6 @@
     "date-fns": "^3.6.0",
     "drizzle-orm": "^0.31.2",
     "nanoid": "^5.0.7",
-    "pg": "^8.12.0",
-    "socket.io": "^4.7.1",
-    "socket.io-client": "^4.7.1"
+    "pg": "^8.12.0"
   }
 }
