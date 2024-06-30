@@ -1,4 +1,4 @@
-import { component$, useVisibleTask$ } from '@builder.io/qwik';
+import { component$ } from '@builder.io/qwik';
 import {
   type DocumentHead,
   Link,
@@ -8,22 +8,23 @@ import {
   zod$,
   z,
 } from '@builder.io/qwik-city';
-import { auth } from '~/lib/lucia';
+import { handleRequest } from '~/server/db/lucia';
+import { login } from '~/server/services/auth/auth';
 
 export const useAuthSigninAction = routeAction$(
-  async (values, event) => {
-    const authRequest = auth.handleRequest(event);
+  async (values, { redirect, fail, cookie }) => {
+    // Important! Use `handleRequest` to handle the authentication request
+    const authRequest = handleRequest({ cookie });
 
-    const key = await auth.useKey('email', values.email, values.password);
-    const session = await auth.createSession({
-      userId: key.userId,
-      attributes: {},
-    });
+    const { message, session } = await login(values.email, values.password);
 
-    authRequest.setSession(session);
+    // if the login fails, return a 400 status code with a message
+    if (!session) return fail(400, { message });
 
-    // redirect to projects page
-    throw event.redirect(303, '/projects');
+    authRequest.setSession(session); // set session cookie
+
+    // make sure you don't throw inside a try/catch block!
+    throw redirect(303, '/projects');
   },
   zod$({
     email: z.string().email(),
@@ -36,9 +37,9 @@ export default component$(() => {
   const authSignInAction = useAuthSigninAction();
   const loc = useLocation();
 
-  useVisibleTask$(() => {
-    console.log(`${loc.url.origin}/projects`);
-  });
+  // useVisibleTask$(() => {
+  //   console.log(`${loc.url.origin}/projects`);
+  // });
 
   return (
     <>

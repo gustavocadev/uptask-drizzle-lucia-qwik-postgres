@@ -6,37 +6,29 @@ import {
   useContextProvider,
   useVisibleTask$,
   useSignal,
-  useTask$,
+  useStore,
 } from '@builder.io/qwik';
 import { SocketContext } from './SocketContext';
-import { type Socket, io } from 'socket.io-client';
 
-export const useSocket = (serverPath: string) => {
-  const socket = useSignal<NoSerialize<Socket>>(undefined);
+const useSocket = (serverPath: string) => {
+  const socket = useSignal<NoSerialize<WebSocket>>(undefined);
+  const isOnline = useSignal<boolean>(false);
 
   // this need to be initialized on the client only
   useVisibleTask$(({ cleanup }) => {
-    const wsClient = io(serverPath);
-    socket.value = noSerialize(wsClient);
+    const ws = new WebSocket(serverPath);
+    socket.value = noSerialize(ws);
+
+    ws.onopen = () => {
+      isOnline.value = true;
+    };
+
+    ws.onclose = () => {
+      isOnline.value = false;
+    };
 
     cleanup(() => {
-      wsClient.close();
-    });
-  });
-
-  const isOnline = useSignal<boolean | undefined>(false);
-
-  useTask$(({ track }) => {
-    track(() => socket.value);
-    socket.value?.on('connect', () => {
-      isOnline.value = socket.value?.connected;
-    });
-  });
-
-  useTask$(({ track }) => {
-    track(() => socket.value);
-    socket.value?.on('disconnect', () => {
-      isOnline.value = socket.value?.connected;
+      ws.close();
     });
   });
 
@@ -48,12 +40,17 @@ export const useSocket = (serverPath: string) => {
 
 export const SocketProvider = component$(() => {
   // my global state
-  const { socket, isOnline } = useSocket('/');
+  const { socket, isOnline } = useSocket(
+    import.meta.env.PUBLIC_WEBSOCKET_SERVER_URL!
+  );
 
   // my providers
-  useContextProvider(SocketContext, {
-    socket,
-    isOnline,
-  });
+  useContextProvider(
+    SocketContext,
+    useStore({
+      socket,
+      isOnline,
+    })
+  );
   return <Slot />;
 });

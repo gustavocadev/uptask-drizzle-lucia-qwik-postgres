@@ -3,11 +3,10 @@ import {
   createContextId,
   type NoSerialize,
 } from '@builder.io/qwik';
-import type { Socket } from 'socket.io-client';
 
 type SocketClient = {
-  socket: Signal<NoSerialize<Socket>>;
-  isOnline: Signal<boolean | undefined>;
+  socket: Signal<NoSerialize<WebSocket>>;
+  isOnline: Signal<boolean>;
 };
 
 export const SocketContext = createContextId<SocketClient>('socket.context');

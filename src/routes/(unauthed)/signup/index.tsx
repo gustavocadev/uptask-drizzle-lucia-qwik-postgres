@@ -1,30 +1,55 @@
 import { component$ } from '@builder.io/qwik';
 import { routeAction$, Form, Link, zod$, z } from '@builder.io/qwik-city';
-import { auth } from '~/lib/lucia';
+import { hashPassword } from 'qwik-lucia';
+import { db } from '~/server/db/db';
+import { userTable } from '~/server/db/schema';
+import pg from 'pg';
 
 export const useSignupAction = routeAction$(
-  async (values, event) => {
-    // create the user in the database
-    await auth.createUser({
-      key: {
-        providerId: 'email',
-        providerUserId: values.email,
-        password: values.password,
-      },
-      attributes: {
+  async (values, { redirect, fail }) => {
+    try {
+      // verify passwords match
+      if (values.password !== values.confirmPassword) {
+        return fail(400, {
+          message: 'Passwords do not match',
+        });
+      }
+
+      const passwordHash = await hashPassword(values.password);
+
+      console.log({ passwordHash });
+
+      await db.insert(userTable).values({
         name: values.name,
+        lastName: values.lastName,
+        passwordHash: passwordHash,
         email: values.email,
-        token: crypto.randomUUID(),
-      },
-    });
-    // redirect to login page
-    throw event.redirect(303, '/');
+      });
+
+      console.log('User created');
+    } catch (e) {
+      console.log(e);
+      if (
+        e instanceof pg.DatabaseError &&
+        e.message === 'AUTH_DUPLICATE_KEY_ID'
+      ) {
+        return fail(400, {
+          message: 'Username already taken',
+        });
+      }
+      return fail(500, {
+        message: 'An unknown error occurred',
+      });
+    }
+    // make sure you don't throw inside a try/catch block!
+    throw redirect(303, '/login');
   },
   zod$({
-    name: z.string().min(3).max(25),
+    name: z.string().min(1).max(50),
+    lastName: z.string().min(1).max(50),
     email: z.string().email(),
-    password: z.string().min(5).max(20),
-    password2: z.string().min(5).max(20),
+    password: z.string().min(8).max(255),
+    confirmPassword: z.string().min(8).max(255),
   })
 );
 
@@ -42,13 +67,29 @@ export default component$(() => {
             class="uppercase text-gray-600 block text-xl font-bold"
             for="name"
           >
-            Name
+            Nombres
           </label>
           <input
             type="text"
             id="name"
             name="name"
-            placeholder="Name de registro"
+            placeholder="Nombres"
+            class="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+          />
+        </div>
+
+        <div>
+          <label
+            class="uppercase text-gray-600 block text-xl font-bold"
+            for="lastName"
+          >
+            Apellidos
+          </label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            placeholder="Apellidos"
             class="w-full mt-3 p-3 border rounded-xl bg-gray-50"
           />
         </div>
@@ -74,7 +115,7 @@ export default component$(() => {
             class="uppercase text-gray-600 block text-xl font-bold"
             for="password"
           >
-            Password
+            Contraseña
           </label>
           <input
             type="text"
@@ -88,14 +129,14 @@ export default component$(() => {
         <div class="mt-5">
           <label
             class="uppercase text-gray-600 block text-xl font-bold"
-            for="password2"
+            for="confirmPassword"
           >
-            Repetir Password
+            Repetir Contraseña
           </label>
           <input
             type="text"
-            id="password2"
-            name="password2"
+            id="confirmPassword"
+            name="confirmPassword"
             placeholder="Repetir password"
             class="w-full mt-3 p-3 border rounded-xl bg-gray-50"
           />

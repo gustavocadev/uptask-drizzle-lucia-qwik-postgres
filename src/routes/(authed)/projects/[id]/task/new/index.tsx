@@ -1,9 +1,4 @@
-import {
-  $,
-  type QwikSubmitEvent,
-  component$,
-  useContext,
-} from '@builder.io/qwik';
+import { $, component$, useContext } from '@builder.io/qwik';
 import { routeLoader$, useNavigate } from '@builder.io/qwik-city';
 import { SocketContext } from '~/context/socket/SocketContext';
 
@@ -16,12 +11,11 @@ export const useLoaderTask = routeLoader$(({ params }) => {
 const priorities = ['low', 'medium', 'high'];
 
 export default component$(() => {
-  // const actionNewTask = useActionNewTask();
   const loaderTask = useLoaderTask();
   const { socket } = useContext(SocketContext);
   const nav = useNavigate();
 
-  const handleSubmit = $(async (e: QwikSubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = $(async (e: SubmitEvent) => {
     const target = e.target as HTMLFormElement;
     const formData = new FormData(target);
     const task = {
@@ -32,7 +26,12 @@ export default component$(() => {
       projectId: formData.get('projectId'),
     };
 
-    socket.value?.emit('new-task', task);
+    socket.value?.send(
+      JSON.stringify({
+        type: 'new-task',
+        payload: task,
+      })
+    );
     await nav(`/projects/${loaderTask.value.projectId}`);
   });
 
