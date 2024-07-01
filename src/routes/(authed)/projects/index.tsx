@@ -10,8 +10,6 @@ export const useLoaderProjects = routeLoader$(async (event) => {
   const { session } = await authRequest.validateUser();
   if (!session) throw event.redirect(303, '/login');
 
-  // console.log({ user });
-
   // get all the projects that the user is the author or contributor
   const projectsByUser = await findProjectsByUserId(session.userId);
 

@@ -15,8 +15,6 @@ export const useActionSearchUsers = routeAction$(
   async (values) => {
     const user = await findOneUserByEmail(values.email);
 
-    console.log({ user });
-
     if (!user) {
       return {
         error: 'User not found',
