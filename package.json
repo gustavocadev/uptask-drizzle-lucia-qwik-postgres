@@ -29,8 +29,8 @@
     "qwik": "qwik"
   },
   "devDependencies": {
-    "@builder.io/qwik": "1.6.0",
-    "@builder.io/qwik-city": "1.6.0",
+    "@builder.io/qwik": "1.5.7",
+    "@builder.io/qwik-city": "1.5.7",
     "@types/bun": "*",
     "@types/eslint": "^8.56.10",
     "@types/node": "^18.15.7",
@@ -41,7 +41,7 @@
     "dotenv": "^16.3.2",
     "drizzle-kit": "^0.22.8",
     "eslint": "^8.57.0",
-    "eslint-plugin-qwik": "1.6.0",
+    "eslint-plugin-qwik": "1.5.7",
     "lucia": "^3.2.0",
     "postcss": "^8.4.39",
     "prettier": "3.3.2",
