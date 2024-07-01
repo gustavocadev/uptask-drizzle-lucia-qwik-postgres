@@ -6,14 +6,14 @@ import type { UserContributor } from '~/server/services/contributor/types/UserCo
 export const useActionRemoveContributor = globalAction$(
   async (values) => {
     // delete one contributor from the project contributors
-    await removeOneContributor(values.projectId, values.contributorId);
+    await removeOneContributor(values.projectId, values.userId);
 
     return {
       success: true,
     };
   },
   zod$({
-    contributorId: z.string(),
+    userId: z.string(),
     projectId: z.string(),
   })
 );
@@ -39,7 +39,7 @@ export default component$(
           <Form action={actionRemoveContributor}>
             <input type="hidden" name="projectId" value={projectId} />
 
-            <input type="hidden" name="contributorId" value={contributor.id} />
+            <input type="hidden" name="userId" value={contributor.id} />
 
             <button
               type="submit"
