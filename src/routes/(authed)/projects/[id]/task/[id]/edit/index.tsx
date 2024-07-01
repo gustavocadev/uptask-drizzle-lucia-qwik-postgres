@@ -1,5 +1,9 @@
 import { $, component$, useContext } from '@builder.io/qwik';
-import { routeLoader$, useNavigate } from '@builder.io/qwik-city';
+import {
+  type DocumentHead,
+  routeLoader$,
+  useNavigate,
+} from '@builder.io/qwik-city';
 import * as dateFns from 'date-fns';
 import { SocketContext } from '~/context/socket/SocketContext';
 import { findOneTask } from '~/server/services/task/task';
@@ -149,3 +153,17 @@ export default component$(() => {
     </>
   );
 });
+
+export const head: DocumentHead = ({ resolveValue }) => {
+  const task = resolveValue(useLoaderTask);
+
+  return {
+    title: `Editar tarea "${task.task.name}"`,
+    meta: [
+      {
+        name: 'description',
+        content: task.task.description,
+      },
+    ],
+  };
+};

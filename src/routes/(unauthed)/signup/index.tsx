@@ -1,5 +1,12 @@
 import { component$ } from '@builder.io/qwik';
-import { routeAction$, Form, Link, zod$, z } from '@builder.io/qwik-city';
+import {
+  routeAction$,
+  Form,
+  Link,
+  zod$,
+  z,
+  type DocumentHead,
+} from '@builder.io/qwik-city';
 import { hashPassword } from 'qwik-lucia';
 import { db } from '~/server/db/db';
 import { userTable } from '~/server/db/schema';
@@ -169,3 +176,13 @@ export default component$(() => {
     </>
   );
 });
+
+export const head: DocumentHead = {
+  title: 'Crea tu cuenta en Mitask',
+  meta: [
+    {
+      name: 'description',
+      content: 'Crea tu cuenta en Mitask y administra tus proyectos',
+    },
+  ],
+};

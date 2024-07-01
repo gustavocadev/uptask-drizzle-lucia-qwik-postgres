@@ -1,6 +1,6 @@
 import { component$ } from '@builder.io/qwik';
 import { PreviewProject } from '~/components/project/PreviewProject';
-import { routeLoader$ } from '@builder.io/qwik-city';
+import { type DocumentHead, routeLoader$ } from '@builder.io/qwik-city';
 import { handleRequest } from '~/server/db/lucia';
 import { findProjectsByUserId } from '~/server/services/project/project';
 import { findOneUser } from '~/server/services/user/user';
@@ -70,3 +70,13 @@ export default component$(() => {
     </>
   );
 });
+
+export const head: DocumentHead = {
+  title: 'Mis projectos',
+  meta: [
+    {
+      name: 'description',
+      content: 'Administra tus proyectos',
+    },
+  ],
+};

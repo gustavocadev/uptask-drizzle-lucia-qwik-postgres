@@ -5,6 +5,7 @@ import {
   z,
   zod$,
   routeAction$,
+  type DocumentHead,
 } from '@builder.io/qwik-city';
 import { createContributor } from '~/server/services/contributor/contributor';
 import { findOneProject } from '~/server/services/project/project';
@@ -152,3 +153,13 @@ export default component$(() => {
     </>
   );
 });
+
+export const head: DocumentHead = {
+  title: 'Añadir Colaborador al Proyecto',
+  meta: [
+    {
+      name: 'description',
+      content: 'Añadir colaborador al proyecto',
+    },
+  ],
+};

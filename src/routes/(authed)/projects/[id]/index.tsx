@@ -1,5 +1,5 @@
 import { component$, useContext, useSignal, useTask$ } from '@builder.io/qwik';
-import { Link, routeLoader$ } from '@builder.io/qwik-city';
+import { type DocumentHead, Link, routeLoader$ } from '@builder.io/qwik-city';
 import Contributor from '~/components/project/Contributor';
 import { Task } from '~/components/task/Task';
 import { SocketContext } from '~/context/socket/SocketContext';
@@ -171,3 +171,21 @@ export default component$(() => {
     </>
   );
 });
+
+export const head: DocumentHead = ({ resolveValue, params }) => {
+  const project = resolveValue(useLoaderProject);
+
+  return {
+    title: `Proyecto "${project.project.name}"`,
+    meta: [
+      {
+        name: 'description',
+        content: project.project.description,
+      },
+      {
+        name: 'id',
+        content: params.id,
+      },
+    ],
+  };
+};

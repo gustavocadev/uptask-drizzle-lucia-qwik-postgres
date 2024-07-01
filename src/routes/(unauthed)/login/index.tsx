@@ -119,11 +119,11 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: 'Welcome to Qwik',
+  title: 'Inicia sesion en Mitask',
   meta: [
     {
       name: 'description',
-      content: 'Qwik site description',
+      content: 'Inicia sesion en Mitask y administra tus proyectos',
     },
   ],
 };
