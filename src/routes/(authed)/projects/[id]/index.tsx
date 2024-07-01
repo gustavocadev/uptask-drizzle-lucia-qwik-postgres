@@ -56,12 +56,12 @@ export default component$(() => {
     track(() => socket.value);
     if (!socket.value) return;
 
-    socket.value.onmessage = (event) => {
+    socket.value.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
       if (data.type === 'get-tasks') {
         tasks.value = data.payload;
       }
-    };
+    });
   });
 
   return (

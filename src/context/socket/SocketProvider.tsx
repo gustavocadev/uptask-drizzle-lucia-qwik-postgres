@@ -19,13 +19,13 @@ const useSocket = (serverPath: string) => {
     const ws = new WebSocket(serverPath);
     socket.value = noSerialize(ws);
 
-    ws.onopen = () => {
+    ws.addEventListener('open', () => {
       isOnline.value = true;
-    };
+    });
 
-    ws.onclose = () => {
+    ws.addEventListener('close', () => {
       isOnline.value = false;
-    };
+    });
 
     cleanup(() => {
       ws.close();
