@@ -1,7 +1,7 @@
 import { component$, Slot } from '@builder.io/qwik';
 import { routeLoader$ } from '@builder.io/qwik-city';
-import { Header } from '~/components/ui/Header';
-import { Sidebar } from '~/components/ui/Sidebar';
+import { Header } from '~/components/shared/Header';
+import { Sidebar } from '~/components/shared/Sidebar';
 import { handleRequest } from '~/server/db/lucia';
 import { findOneUser } from '~/server/services/user/user';
 
