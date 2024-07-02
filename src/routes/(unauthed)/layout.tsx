@@ -7,7 +7,7 @@ export const useLoaderData = routeLoader$(async (event) => {
   const { session } = await authRequest.validateUser();
 
   console.log(
-    'If there is a session redirect to /projects if not redirect to /'
+    'If there is a session redirect to /projects if not redirect to /projects'
   );
   if (session) throw event.redirect(303, '/projects');
 

@@ -1,6 +1,6 @@
 import { component$ } from '@builder.io/qwik';
 import { PreviewProject } from '~/components/project/PreviewProject';
-import { routeLoader$ } from '@builder.io/qwik-city';
+import { type DocumentHead, routeLoader$ } from '@builder.io/qwik-city';
 import { handleRequest } from '~/server/db/lucia';
 import { findProjectsByUserId } from '~/server/services/project/project';
 import { findOneUser } from '~/server/services/user/user';
@@ -9,8 +9,6 @@ export const useLoaderProjects = routeLoader$(async (event) => {
   const authRequest = handleRequest(event);
   const { session } = await authRequest.validateUser();
   if (!session) throw event.redirect(303, '/login');
-
-  // console.log({ user });
 
   // get all the projects that the user is the author or contributor
   const projectsByUser = await findProjectsByUserId(session.userId);
@@ -70,3 +68,13 @@ export default component$(() => {
     </>
   );
 });
+
+export const head: DocumentHead = {
+  title: 'Mis projectos',
+  meta: [
+    {
+      name: 'description',
+      content: 'Administra tus proyectos',
+    },
+  ],
+};

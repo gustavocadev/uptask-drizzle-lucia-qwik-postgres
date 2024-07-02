@@ -1,8 +1,17 @@
 import { $, component$, useContext } from '@builder.io/qwik';
-import { routeLoader$, useNavigate } from '@builder.io/qwik-city';
+import {
+  type DocumentHead,
+  routeLoader$,
+  useNavigate,
+} from '@builder.io/qwik-city';
 import * as dateFns from 'date-fns';
-import { SocketContext } from '~/context/socket/SocketContext';
+import { TaskContext } from '~/context/task/TaskContext';
 import { findOneTask } from '~/server/services/task/task';
+import { parseWithZod } from '@conform-to/zod';
+import { z } from '@builder.io/qwik-city';
+import { Button } from '~/components/ui/button/button';
+import { Input } from '~/components/ui/input/input';
+import { Textarea } from '~/components/ui/textarea/textarea';
 
 export const useLoaderTask = routeLoader$(async ({ params }) => {
   const task = await findOneTask(params.id);
@@ -23,29 +32,42 @@ export const useLoaderTask = routeLoader$(async ({ params }) => {
   };
 });
 
-const priorities = ['low', 'medium', 'high'];
+const priorities = ['low', 'medium', 'high'] as const;
 
 export default component$(() => {
   // const actionUpdateTask = useActionUpdateTask();
   const loaderTask = useLoaderTask();
-  const { socket } = useContext(SocketContext);
+  const { updateTask } = useContext(TaskContext);
   const nav = useNavigate();
 
   const handleUpdateTask = $(async (e: SubmitEvent) => {
     const target = e.target as HTMLFormElement;
     const formData = new FormData(target);
 
-    const task = Object.fromEntries(formData.entries());
+    const submission = parseWithZod(formData, {
+      schema: z.object({
+        name: z.string().min(1),
+        description: z.string().min(1),
+        priority: z.enum(priorities),
+        dueDate: z.string(),
+      }),
+    });
 
-    socket.value?.send(
-      JSON.stringify({
-        type: 'update-task',
-        payload: {
-          taskId: loaderTask.value.task?.id,
-          newTask: task,
-        },
-      })
-    );
+    if (submission.status !== 'success') {
+      return '';
+    }
+    const task = submission.value;
+
+    updateTask({
+      newTask: {
+        deliveryDate: task.dueDate,
+        description: task.description,
+        name: task.name,
+        priority: task.priority,
+      },
+      projectId: loaderTask.value.task.projectId!,
+      taskId: loaderTask.value.task.id,
+    });
 
     await nav('/projects/' + loaderTask.value.task?.projectId);
   });
@@ -53,52 +75,48 @@ export default component$(() => {
   return (
     <>
       <div class="sm:flex sm:items-start">
-        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full space-y-8">
           <h3 class="text-4xl leading-6 font-bold text-gray-900">
             Editar Tarea
           </h3>
           <form
-            class="mt-10"
+            class="space-y-4"
             onSubmit$={handleUpdateTask}
             preventdefault:submit
           >
-            <div class="mb-5">
-              <label
-                for="name"
-                class="block text-gray-700 text-sm font-bold mb-2"
-              >
+            <div class="space-y-2">
+              <label for="name" class="block text-gray-700 text-sm font-bold">
                 Nombre de la tarea
               </label>
-              <input
+              <Input
                 type="text"
                 id="name"
                 name="name"
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 placeholder="Nombre de la tarea"
                 value={loaderTask.value.task?.name}
               />
             </div>
 
-            <div class="mb-5">
+            <div class="space-y-2">
               <label
                 for="description"
-                class="block text-gray-700 text-sm font-bold mb-2"
+                class="block text-gray-700 text-sm font-bold"
               >
                 Descipción de la tarea
               </label>
-              <textarea
+              <Textarea
                 id="description"
                 name="description"
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 placeholder="Nombre de la tarea"
+                class="bg-white"
                 value={loaderTask.value.task?.description}
               />
             </div>
 
-            <div class="mb-5">
+            <div class="space-y-2">
               <label
                 for="priority"
-                class="block text-gray-700 text-sm font-bold mb-2"
+                class="block text-gray-700 text-sm font-bold"
               >
                 Prioridad
               </label>
@@ -121,31 +139,41 @@ export default component$(() => {
               </select>
             </div>
 
-            <div class="mb-5">
+            <div class="space-y-2">
               <label
                 for="due-date"
-                class="block text-gray-700 text-sm font-bold mb-2"
+                class="block text-gray-700 text-sm font-bold"
               >
                 Fecha de entrega
               </label>
-              <input
+              <Input
                 type="date"
                 id="due-date"
                 name="dueDate"
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 value={loaderTask.value.inputDateFormat}
               />
             </div>
 
-            <button
-              type="submit"
-              class="bg-sky-600 hover:bg-sky-700 p-3 text-white uppercase font-bold transition-colors rounded text-sm w-full"
-            >
+            <Button type="submit" class="w-full uppercase text-md font-bold">
               Actualizar tarea
-            </button>
+            </Button>
           </form>
         </div>
       </div>
     </>
   );
 });
+
+export const head: DocumentHead = ({ resolveValue }) => {
+  const task = resolveValue(useLoaderTask);
+
+  return {
+    title: `Editar tarea "${task.task.name}"`,
+    meta: [
+      {
+        name: 'description',
+        content: task.task.description,
+      },
+    ],
+  };
+};

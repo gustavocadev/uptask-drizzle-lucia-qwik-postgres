@@ -1,5 +1,9 @@
 import { $, component$, useContext } from '@builder.io/qwik';
-import { routeLoader$, useNavigate } from '@builder.io/qwik-city';
+import {
+  type DocumentHead,
+  routeLoader$,
+  useNavigate,
+} from '@builder.io/qwik-city';
 import { SocketContext } from '~/context/socket/SocketContext';
 
 export const useLoaderTask = routeLoader$(({ params }) => {
@@ -129,3 +133,13 @@ export default component$(() => {
     </>
   );
 });
+
+export const head: DocumentHead = {
+  title: 'Crear tarea',
+  meta: [
+    {
+      name: 'description',
+      content: 'Crear una nueva tarea',
+    },
+  ],
+};

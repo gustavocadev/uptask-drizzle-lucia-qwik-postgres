@@ -5,11 +5,12 @@ import {
   useSignal,
   useTask$,
 } from '@builder.io/qwik';
-import { useNavigate } from '@builder.io/qwik-city';
+import { useLocation, useNavigate } from '@builder.io/qwik-city';
 import * as dateFns from 'date-fns';
-import { SocketContext } from '~/context/socket/SocketContext';
 import { useUserDataLoader } from '~/routes/(authed)/layout';
 import type { Task as ITask } from '~/server/services/task/entities/task';
+import { Button } from '~/components/ui/button/button';
+import { TaskContext } from '~/context/task/TaskContext';
 
 export interface TaskProps {
   task: ITask;
@@ -19,9 +20,10 @@ export interface TaskProps {
 
 export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
   const spanishDateFormat = useSignal('');
-  const { socket } = useContext(SocketContext);
+  const { deleteTaskById, updateTaskState } = useContext(TaskContext);
   const userData = useUserDataLoader();
   const nav = useNavigate();
+  const loc = useLocation();
 
   // runs on the server which means it runs before the render the component thanks to resumability
   useTask$(() => {
@@ -40,12 +42,7 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
 
     const taskId = formData.get('taskId') as string;
 
-    socket?.value?.send(
-      JSON.stringify({
-        type: 'delete-task',
-        payload: { taskId },
-      })
-    );
+    deleteTaskById(taskId, loc.params.id);
   });
 
   const handleChangeState = $((e: SubmitEvent) => {
@@ -57,12 +54,12 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
 
     const userId = userData.value.user.id;
 
-    socket?.value?.send(
-      JSON.stringify({
-        type: 'update-task-state',
-        payload: { taskId, taskState, userId },
-      })
-    );
+    updateTaskState({
+      projectId: loc.params.id,
+      taskId,
+      taskState,
+      userId,
+    });
   });
 
   return (
@@ -81,50 +78,41 @@ export const Task = component$<TaskProps>(({ task, authorId, userAuthId }) => {
 
       <div class="flex flex-col lg:flex-row gap-2">
         {authorId === userAuthId && (
-          <button
+          <Button
             onClick$={() => {
               nav(`/projects/${task.projectId}/task/${task.id}/edit`);
             }}
-            class="bg-indigo-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
+            look="edit"
           >
             Editar
-          </button>
+          </Button>
         )}
 
         {task.state ? (
           <form onSubmit$={handleChangeState} preventdefault:submit>
             <input type="hidden" name="taskId" value={task.id} />
             <input type="hidden" name="taskState" value={0} />
-            <button
-              type="submit"
-              class="bg-sky-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
-            >
+            <Button type="submit" look="success">
               Completa
-            </button>
+            </Button>
           </form>
         ) : (
           <form onSubmit$={handleChangeState} preventdefault:submit>
             <input type="hidden" name="taskId" value={task.id} />
             <input type="hidden" name="taskState" value={1} />
 
-            <button
-              type="submit"
-              class="bg-gray-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
-            >
+            <Button type="submit" look="primary">
               Incompleta
-            </button>
+            </Button>
           </form>
         )}
 
         {authorId === userAuthId && (
           <form onSubmit$={handleSubmit} preventdefault:submit>
             <input type="hidden" name="taskId" value={task.id} />
-            <button
-              type="submit"
-              class="bg-red-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
-            >
+            <Button type="submit" look="destructive">
               Eliminar
-            </button>
+            </Button>
           </form>
         )}
       </div>

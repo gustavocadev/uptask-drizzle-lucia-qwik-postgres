@@ -2,18 +2,19 @@ import { component$ } from '@builder.io/qwik';
 import { Form, globalAction$, z, zod$ } from '@builder.io/qwik-city';
 import { removeOneContributor } from '~/server/services/contributor/contributor';
 import type { UserContributor } from '~/server/services/contributor/types/UserContributor';
+import { Button } from '../ui/button/button';
 
 export const useActionRemoveContributor = globalAction$(
   async (values) => {
     // delete one contributor from the project contributors
-    await removeOneContributor(values.projectId, values.contributorId);
+    await removeOneContributor(values.projectId, values.userId);
 
     return {
       success: true,
     };
   },
   zod$({
-    contributorId: z.string(),
+    userId: z.string(),
     projectId: z.string(),
   })
 );
@@ -39,14 +40,11 @@ export default component$(
           <Form action={actionRemoveContributor}>
             <input type="hidden" name="projectId" value={projectId} />
 
-            <input type="hidden" name="contributorId" value={contributor.id} />
+            <input type="hidden" name="userId" value={contributor.id} />
 
-            <button
-              type="submit"
-              class="bg-red-600 px-4 py-3 text-white uppercase font-bold text-sm rounded-lg"
-            >
+            <Button type="submit" look="destructive">
               Eliminar
-            </button>
+            </Button>
           </Form>
         )}
       </div>

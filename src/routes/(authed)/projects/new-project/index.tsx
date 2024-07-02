@@ -5,6 +5,7 @@ import {
   zod$,
   Form,
   routeLoader$,
+  type DocumentHead,
 } from '@builder.io/qwik-city';
 import * as dateFns from 'date-fns';
 import { handleRequest } from '~/server/db/lucia';
@@ -143,3 +144,13 @@ export default component$(() => {
     </>
   );
 });
+
+export const head: DocumentHead = {
+  title: 'Nuevo proyecto',
+  meta: [
+    {
+      name: 'description',
+      content: 'Crea un nuevo proyecto',
+    },
+  ],
+};

@@ -32,14 +32,20 @@ export const createContributor = async (
 
 export const removeOneContributor = async (
   projectId: string,
-  contributorId: string
+  userId: string
 ): Promise<void> => {
-  await db
-    .delete(contributor)
-    .where(
-      and(
-        eq(contributor.projectId, projectId),
-        eq(contributor.id, contributorId)
-      )
-    );
+  await db.transaction(async (tx) => {
+    try {
+      await db
+        .delete(contributor)
+        .where(
+          and(
+            eq(contributor.userId, userId),
+            eq(contributor.projectId, projectId)
+          )
+        );
+    } catch (error) {
+      tx.rollback();
+    }
+  });
 };

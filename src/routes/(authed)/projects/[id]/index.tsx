@@ -1,12 +1,18 @@
-import { component$, useContext, useSignal, useTask$ } from '@builder.io/qwik';
-import { Link, routeLoader$ } from '@builder.io/qwik-city';
+import { component$, useContext, useTask$ } from '@builder.io/qwik';
+import {
+  type DocumentHead,
+  Link,
+  routeLoader$,
+  useLocation,
+} from '@builder.io/qwik-city';
 import Contributor from '~/components/project/Contributor';
 import { Task } from '~/components/task/Task';
+import { Button } from '~/components/ui/button/button';
 import { SocketContext } from '~/context/socket/SocketContext';
+import { TaskContext } from '~/context/task/TaskContext';
 import { handleRequest } from '~/server/db/lucia';
 import { findContributorsByProjectId } from '~/server/services/contributor/contributor';
 import { findOneProject } from '~/server/services/project/project';
-import type { Task as ITask } from '~/server/services/task/entities/task';
 import { findOneUser } from '~/server/services/user/user';
 
 export const useLoaderProject = routeLoader$(async ({ params }) => {
@@ -48,24 +54,17 @@ export default component$(() => {
   const loaderContributors = useLoaderContributors();
   const loaderUserAuth = useLoaderUserAuth();
 
-  const tasks = useSignal<ITask[]>([]);
-  const { socket, isOnline } = useContext(SocketContext);
+  const { tasks, getTasksByProjectId } = useContext(TaskContext);
+  const { isOnline } = useContext(SocketContext);
+  const loc = useLocation();
 
-  // this task will be executed only when the socket changes
   useTask$(({ track }) => {
-    track(() => socket.value);
-    if (!socket.value) return;
-
-    socket.value.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'get-tasks') {
-        tasks.value = data.payload;
-      }
-    };
+    track(() => [loc.params.id]);
+    getTasksByProjectId(loc.params.id);
   });
 
   return (
-    <>
+    <div class="space-y-4">
       <div class="flex justify-between">
         <h1 class="font-black text-4xl">
           {loaderProject.value.project?.name ?? ''} -{' '}
@@ -103,52 +102,62 @@ export default component$(() => {
         loaderProject.value.project?.userId && (
         <Link
           href={`/projects/${loaderProject.value.project?.id}/task/new`}
-          // onClick={projectStore.toggleModalFormTask}
-          class="text-sm px-5 py-3 w-full md:w-auto rounded uppercase font-bold bg-sky-600 text-white text-center mt-5 flex gap-2 items-center justify-center"
+          class="flex items-center gap-1"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width={1.5}
-            stroke="currentColor"
-            class="w-6 h-6"
+          <Button
+            // onClick={projectStore.toggleModalFormTask}
+            class="w-full"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          Nueva Tarea
+            Nueva Tarea
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width={1.5}
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </Button>
         </Link>
       )}
 
-      <p class="font-bold text-xl m4-10">Tareas del proyecto</p>
-      <div class="bg-white shadow mt-10 rounded-lg">
-        {tasks.value.length ? (
-          tasks.value.map((task) => (
-            <Task
-              key={task.id}
-              task={task}
-              authorId={loaderProject.value.project?.userId ?? ''}
-              userAuthId={loaderUserAuth.value.user?.id ?? ''}
-            />
-          ))
-        ) : (
-          <p class="text-center my-5 p-10">No hay tareas</p>
-        )}
+      <div class="space-y-2">
+        <p class="font-bold text-xl">Tareas del proyecto</p>
+        <div class="bg-white shadow rounded-lg">
+          {tasks.value.length ? (
+            tasks.value.map((task) => (
+              <Task
+                key={task.id}
+                task={task}
+                authorId={loaderProject.value.project?.userId ?? ''}
+                userAuthId={loaderUserAuth.value.user?.id ?? ''}
+              />
+            ))
+          ) : (
+            <p class="text-center my-5 p-10">No hay tareas</p>
+          )}
+        </div>
       </div>
       <div class="flex items-center justify-between mt-10">
         <p class="font-bold text-xl">Colaboradores</p>
         {loaderUserAuth.value.user?.id ===
           loaderProject.value.project?.userId && (
-          <Link
-            class="uppercase font-bold text-gray-400 hover:text-black transition-colors "
-            href={`/projects/${loaderProject.value.project?.id}/new-contributor`}
+          <Button
+            look="link"
+            class="uppercase font-bold text-gray-400 hover:text-black hover:no-underline"
           >
-            Agregar colaborador
-          </Link>
+            <Link
+              href={`/projects/${loaderProject.value.project?.id}/new-contributor`}
+            >
+              Agregar colaborador
+            </Link>
+          </Button>
         )}
       </div>
       <div>
@@ -168,6 +177,24 @@ export default component$(() => {
         )}
       </div>
       {/* <ModalFormTask /> */}
-    </>
+    </div>
   );
 });
+
+export const head: DocumentHead = ({ resolveValue, params }) => {
+  const project = resolveValue(useLoaderProject);
+
+  return {
+    title: `Proyecto "${project.project.name}"`,
+    meta: [
+      {
+        name: 'description',
+        content: project.project.description,
+      },
+      {
+        name: 'id',
+        content: params.id,
+      },
+    ],
+  };
+};
