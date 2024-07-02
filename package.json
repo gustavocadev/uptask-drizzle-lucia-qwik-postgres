@@ -31,9 +31,11 @@
   "devDependencies": {
     "@builder.io/qwik": "1.5.7",
     "@builder.io/qwik-city": "1.5.7",
+    "@conform-to/zod": "^1.1.5",
     "@qwik-ui/headless": "^0.4.4",
     "@qwik-ui/styled": "^0.1.0",
     "@qwik-ui/utils": "^0.2.1",
+    "@qwikest/icons": "^0.0.13",
     "@types/bun": "*",
     "@types/eslint": "^8.56.10",
     "@types/node": "^18.15.7",
