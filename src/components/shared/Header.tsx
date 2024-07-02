@@ -1,6 +1,8 @@
 import { component$ } from '@builder.io/qwik';
 import { Form, Link, globalAction$ } from '@builder.io/qwik-city';
 import { handleRequest } from '~/server/db/lucia';
+import { Button } from '../ui/button/button';
+import { Input } from '../ui/input/input';
 
 export const useSignoutAction = globalAction$(async (values, event) => {
   const authRequest = handleRequest(event);
@@ -17,32 +19,27 @@ export const Header = component$(() => {
   const signoutAction = useSignoutAction();
   return (
     <header class="px-4 py-5 bg-white border-b">
-      <nav class="md:flex md:justify-between">
-        <h2 class="text-4xl text-sky-600 font-black text-center mb-5 md:mb-0">
-          <Link href="/projects">Mitask</Link>
-        </h2>
+      <nav class="md:flex md:justify-between items-center">
+        <Link
+          href="/projects"
+          class="text-4xl text-secondary font-black text-center"
+        >
+          Mitask
+        </Link>
 
         <div class="flex flex-col md:flex-row items-center gap-4">
           <Form spaReset>
-            <input
-              type="input"
-              class="border border-gray-300 p-3 rounded-md"
-              placeholder="Buscar"
-              name="search"
-            />
+            <Input type="input" placeholder="Buscar" name="search" />
           </Form>
-          <Link href="/projects" class="font-bold uppercase">
-            Proyectos
+          <Link href="/projects">
+            <Button class="font-bold uppercase" look="outline">
+              Proyectos
+            </Button>
           </Link>
           <Form action={signoutAction}>
-            <button
-              type="submit"
-              class="
-          text-white text-sm bg-sky-600 p-3 rounded-md uppercase font-bold
-          "
-            >
+            <Button type="submit" look="destructive">
               Cerrar sesion
-            </button>
+            </Button>
           </Form>
           {/* <Busqueda /> */}
         </div>

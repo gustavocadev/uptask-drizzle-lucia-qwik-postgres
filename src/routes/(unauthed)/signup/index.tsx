@@ -11,6 +11,8 @@ import { hashPassword } from 'qwik-lucia';
 import { db } from '~/server/db/db';
 import { userTable } from '~/server/db/schema';
 import pg from 'pg';
+import { Button } from '~/components/ui/button/button';
+import { Input } from '~/components/ui/input/input';
 
 export const useSignupAction = routeAction$(
   async (values, { redirect, fail }) => {
@@ -62,118 +64,117 @@ export const useSignupAction = routeAction$(
 
 export default component$(() => {
   const signupAction = useSignupAction();
+
   return (
-    <>
-      <h1 class="text-sky-600 font-black text-6xl">
+    <main class="space-y-10">
+      <h1 class="text-primary font-black text-6xl">
         Crea tu cuenta y administra tus{' '}
         <span class="text-slate-700">proyectos</span>
       </h1>
-      <Form action={signupAction} class="mt-10 bg-white shadow rounded-lg p-10">
-        <div>
-          <label
-            class="uppercase text-gray-600 block text-xl font-bold"
-            for="name"
-          >
-            Nombres
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            placeholder="Nombres"
-            class="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label
-            class="uppercase text-gray-600 block text-xl font-bold"
-            for="lastName"
-          >
-            Apellidos
-          </label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            placeholder="Apellidos"
-            class="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-          />
-        </div>
-
-        <div>
-          <label
-            class="uppercase text-gray-600 block text-xl font-bold"
-            for="email"
-          >
-            Email
-          </label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            placeholder="Email de registro"
-            class="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-          />
-        </div>
-
-        <div class="mt-5">
-          <label
-            class="uppercase text-gray-600 block text-xl font-bold"
-            for="password"
-          >
-            Contraseña
-          </label>
-          <input
-            type="text"
-            id="password"
-            name="password"
-            placeholder="Password de registro"
-            class="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-          />
-        </div>
-
-        <div class="mt-5">
-          <label
-            class="uppercase text-gray-600 block text-xl font-bold"
-            for="confirmPassword"
-          >
-            Repetir Contraseña
-          </label>
-          <input
-            type="text"
-            id="confirmPassword"
-            name="confirmPassword"
-            placeholder="Repetir password"
-            class="w-full mt-3 p-3 border rounded-xl bg-gray-50"
-          />
-        </div>
-
-        <button
-          type="submit"
-          class="bg-sky-700 w-full py-3 text-white uppercase font-bold rounded cursor-pointer hover:bg-sky-800 transition-colors mt-5"
+      <div>
+        <Form
+          action={signupAction}
+          class="bg-white shadow rounded-lg p-10 space-y-6"
         >
-          Crear cuenta
-        </button>
-      </Form>
-      <nav class="lg:flex lg:justify-between">
-        <Link
-          href="/"
-          preventdefault:reset
-          class="block text-center my-5 text-slate-500 uppercase text-sm"
-        >
-          ¿Ya tienes una cuenta? Inicia sesión
-        </Link>
+          <div class="space-y-2">
+            <label
+              class="uppercase text-gray-600 block text-xl font-bold"
+              for="name"
+            >
+              Nombres
+            </label>
+            <Input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Nombres"
+              class="w-full bg-gray-50"
+            />
+          </div>
 
-        <Link
-          href="/recover-password"
-          preventdefault:reset
-          class="block text-center my-5 text-slate-500 uppercase text-sm"
-        >
-          ¿Olvidaste tu contraseña?
-        </Link>
-      </nav>
-    </>
+          <div class="space-y-2">
+            <label
+              class="uppercase text-gray-600 block text-xl font-bold"
+              for="lastName"
+            >
+              Apellidos
+            </label>
+            <Input
+              type="text"
+              id="lastName"
+              name="lastName"
+              placeholder="Apellidos"
+              class="w-full bg-gray-50"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label
+              class="uppercase text-gray-600 block text-xl font-bold"
+              for="email"
+            >
+              Email
+            </label>
+            <Input
+              type="text"
+              id="email"
+              name="email"
+              placeholder="Email de registro"
+              class="w-full bg-gray-50"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label
+              class="uppercase text-gray-600 block text-xl font-bold"
+              for="password"
+            >
+              Contraseña
+            </label>
+            <Input
+              type="text"
+              id="password"
+              name="password"
+              placeholder="Password de registro"
+              class="w-full bg-gray-50"
+            />
+          </div>
+
+          <div class="space-y-2">
+            <label
+              class="uppercase text-gray-600 block text-xl font-bold"
+              for="confirmPassword"
+            >
+              Repetir Contraseña
+            </label>
+            <Input
+              type="text"
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Repetir password"
+              class="w-full bg-gray-50"
+            />
+          </div>
+
+          <Button type="submit" class="w-full uppercase text-md font-bold">
+            Crear cuenta
+          </Button>
+        </Form>
+        <footer class="lg:flex lg:justify-between">
+          <Link href="/" preventdefault:reset>
+            <Button look="link" class="uppercase text-sm">
+              ¿Ya tienes una cuenta? Inicia sesión
+            </Button>
+          </Link>
+
+          <Link href="/recover-password" preventdefault:reset>
+            <Button look="link" class="uppercase text-sm">
+              ¿Olvidaste tu contraseña?
+            </Button>
+          </Link>
+        </footer>
+      </div>
+    </main>
   );
 });
 
