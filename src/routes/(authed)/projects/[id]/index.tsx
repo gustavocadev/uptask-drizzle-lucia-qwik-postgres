@@ -58,7 +58,8 @@ export default component$(() => {
   const { isOnline } = useContext(SocketContext);
   const loc = useLocation();
 
-  useTask$(() => {
+  useTask$(({ track }) => {
+    track(() => [loc.params.id]);
     getTasksByProjectId(loc.params.id);
   });
 
