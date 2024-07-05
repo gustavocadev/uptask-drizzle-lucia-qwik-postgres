@@ -33,13 +33,13 @@ export default component$(() => {
       </form>
       <nav class="lg:flex lg:justify-between">
         <Link href="/">
-          <Button look="link" class="uppercase text-sm">
+          <Button look="link" class="uppercase text-sm" type="button">
             ¿Ya tienes una cuenta? Inicia sesión
           </Button>
         </Link>
 
         <Link href="/signup">
-          <Button look="link" class="uppercase text-sm">
+          <Button look="link" class="uppercase text-sm" type="button">
             ¿No tienes una cuenta? Regístrate
           </Button>
         </Link>

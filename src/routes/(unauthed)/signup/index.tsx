@@ -161,14 +161,14 @@ export default component$(() => {
           </Button>
         </Form>
         <footer class="lg:flex lg:justify-between">
-          <Link href="/" preventdefault:reset>
-            <Button look="link" class="uppercase text-sm">
+          <Link href="/">
+            <Button look="link" class="uppercase text-sm" type="button">
               ¿Ya tienes una cuenta? Inicia sesión
             </Button>
           </Link>
 
-          <Link href="/recover-password" preventdefault:reset>
-            <Button look="link" class="uppercase text-sm">
+          <Link href="/recover-password">
+            <Button look="link" class="uppercase text-sm" type="button">
               ¿Olvidaste tu contraseña?
             </Button>
           </Link>
