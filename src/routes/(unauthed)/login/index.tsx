@@ -95,14 +95,14 @@ export default component$(() => {
           </Button>
         </Form>
         <footer class="lg:flex lg:justify-between">
-          <Link href="/signup" preventdefault:reset>
-            <Button look="link" class="uppercase text-sm">
+          <Link href="/signup">
+            <Button look="link" class="uppercase text-sm" type="button">
               No tienes cuenta? Registrate
             </Button>
           </Link>
 
-          <Link href="/recover-password" preventdefault:reset>
-            <Button look="link" class="uppercase text-sm">
+          <Link href="/recover-password">
+            <Button look="link" class="uppercase text-sm" type="button">
               Olvidaste tu password?
             </Button>
           </Link>
