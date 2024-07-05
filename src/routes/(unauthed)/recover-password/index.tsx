@@ -32,7 +32,7 @@ export default component$(() => {
         </Button>
       </form>
       <nav class="lg:flex lg:justify-between">
-        <Link href="/">
+        <Link href="/login">
           <Button look="link" class="uppercase text-sm" type="button">
             ¿Ya tienes una cuenta? Inicia sesión
           </Button>
