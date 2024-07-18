@@ -55,11 +55,11 @@ export default component$(() => {
   const loaderUserAuth = useLoaderUserAuth();
 
   const { tasks, getTasksByProjectId } = useContext(TaskContext);
-  const { isOnline } = useContext(SocketContext);
+  const { isOnline, socket } = useContext(SocketContext);
   const loc = useLocation();
 
   useTask$(({ track }) => {
-    track(() => [loc.params.id]);
+    track(() => socket.value);
     getTasksByProjectId(loc.params.id);
   });
 
